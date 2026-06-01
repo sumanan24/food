@@ -8,16 +8,18 @@ declare(strict_types=1);
 define('ROOT_PATH', dirname(__DIR__));
 define('APP_PATH', ROOT_PATH . '/app');
 
-// Autoloader
+// Autoloader (folder names are lowercase; namespaces use PascalCase — required on Linux)
 spl_autoload_register(function (string $class): void {
     $map = [
-        'Core\\' => ROOT_PATH . '/core/',
-        'App\\'  => APP_PATH . '/',
+        'App\\Controllers\\' => APP_PATH . '/controllers/',
+        'App\\Models\\'      => APP_PATH . '/models/',
+        'Core\\'             => ROOT_PATH . '/core/',
+        'App\\'              => APP_PATH . '/',
     ];
     foreach ($map as $prefix => $base) {
         if (str_starts_with($class, $prefix)) {
             $file = $base . str_replace('\\', '/', substr($class, strlen($prefix))) . '.php';
-            if (file_exists($file)) {
+            if (is_file($file)) {
                 require $file;
                 return;
             }
