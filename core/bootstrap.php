@@ -62,12 +62,15 @@ function app_handle_exception(Throwable $e): void
 /** app_url() without loading helpers.php (used during fatal errors). */
 function app_url_safe(): string
 {
+    if (function_exists('app_url')) {
+        return app_url();
+    }
     if (!empty($_SERVER['HTTP_HOST'])) {
-        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-            || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
-            ? 'https' : 'http';
+        $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
         $script = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '/index.php');
         $dir = rtrim(dirname($script), '/');
+        $scheme = $secure ? 'https' : 'http';
         return $scheme . '://' . $_SERVER['HTTP_HOST'] . ($dir === '' || $dir === '.' ? '' : $dir);
     }
     return rtrim((app_config()['url'] ?? ''), '/');

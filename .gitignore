@@ -1,2 +1,4 @@
 config/database.local.php
+config/app.local.php
 backups/*.sql
+tmp_cookies.txt

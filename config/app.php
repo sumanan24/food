@@ -1,21 +1,27 @@
 <?php
 /**
- * Application Configuration
+ * Application configuration.
+ * URLs are auto-detected (localhost + cPanel). Override in config/app.local.php if needed.
  */
-return [
-    'name'          => 'Food Shop Management',
-    // Overridden at runtime by app_url() from HTTP_HOST; set APP_URL env on server if needed
-    'url'           => 'http://localhost/food/public',
-    'timezone'      => 'Asia/Colombo',
-    'session_name'  => 'FOOD_SHOP_SESSION',
-    'session_lifetime' => 3600, // 1 hour
-    'remember_days' => 30,
-    'upload_path'   => dirname(__DIR__) . '/public/uploads/products/',
-    'upload_url'    => '/food/public/uploads/products/',
-    'max_upload'    => 2097152, // 2MB
-    'low_stock_threshold' => 10,
-    'currency'      => 'Rs.',
-    'tax_rate'      => 0, // percentage, configurable in settings
-    'csrf_token_name' => '_csrf_token',
-    'debug'           => false, // true or APP_DEBUG=1 on server to see error details
+$config = [
+    'name'               => 'Food Shop Management',
+    'url'                => '', // leave empty — app_url() detects from domain + /public path
+    'timezone'           => 'Asia/Colombo',
+    'session_name'       => 'FOOD_SHOP_SESSION',
+    'session_lifetime'   => 3600,
+    'remember_days'      => 30,
+    'upload_path'        => dirname(__DIR__) . '/public/uploads/products/',
+    'max_upload'         => 2097152,
+    'low_stock_threshold'=> 10,
+    'currency'           => 'Rs.',
+    'tax_rate'           => 0,
+    'csrf_token_name'    => '_csrf_token',
+    'debug'              => false,
 ];
+
+$local = __DIR__ . '/app.local.php';
+if (is_file($local)) {
+    $config = array_merge($config, require $local);
+}
+
+return $config;

@@ -3,6 +3,14 @@
  * Global helper functions (must not be in a namespace)
  */
 
+function request_scheme(): string
+{
+    $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+        || (!empty($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443);
+    return $secure ? 'https' : 'http';
+}
+
 function app_url(): string
 {
     static $base = null;
@@ -13,14 +21,22 @@ function app_url(): string
     if ($env !== false && $env !== '') {
         return $base = rtrim($env, '/');
     }
+    $config = require dirname(__DIR__) . '/config/app.php';
+    if (!empty($config['url'])) {
+        return $base = rtrim($config['url'], '/');
+    }
     if (!empty($_SERVER['HTTP_HOST'])) {
-        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
         $script = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '/index.php');
         $dir = rtrim(dirname($script), '/');
-        return $base = $scheme . '://' . $_SERVER['HTTP_HOST'] . ($dir === '' || $dir === '.' ? '' : $dir);
+        return $base = request_scheme() . '://' . $_SERVER['HTTP_HOST']
+            . ($dir === '' || $dir === '.' ? '' : $dir);
     }
-    $config = require dirname(__DIR__) . '/config/app.php';
-    return $base = rtrim($config['url'], '/');
+    return $base = 'http://localhost/food/public';
+}
+
+function upload_url(string $file = ''): string
+{
+    return url('uploads/products/' . ltrim($file, '/'));
 }
 
 function url(string $path = ''): string
@@ -32,7 +48,14 @@ function url(string $path = ''): string
     if (preg_match('#^https?://#i', $path)) {
         return $path;
     }
-    return app_url() . '/' . ltrim($path, '/');
+    $path = ltrim($path, '/');
+    // Avoid /food/public/food/ when path is mistakenly the project folder name
+    $basePath = parse_url(app_url(), PHP_URL_PATH) ?: '';
+    $projectFolder = $basePath !== '' ? basename(dirname($basePath)) : '';
+    if ($projectFolder !== '' && $projectFolder !== 'public' && $path === $projectFolder) {
+        $path = '';
+    }
+    return app_url() . ($path !== '' ? '/' . $path : '');
 }
 
 function asset(string $path): string

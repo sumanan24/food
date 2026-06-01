@@ -1,6 +1,13 @@
-RewriteEngine On
-# No RewriteBase — works for localhost (/food/public/) and production (/public/)
+# Food Shop — public folder (cPanel document root can point here)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
 
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+</IfModule>
+
+Options -Indexes
+
+# PHP 8+ (uncomment on cPanel if Select PHP Version is not enough)
+# AddHandler application/x-httpd-ea-php83 .php

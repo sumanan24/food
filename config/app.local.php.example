@@ -1,0 +1,10 @@
+<?php
+/**
+ * Optional overrides (cPanel or local).
+ * Copy to app.local.php — do not commit app.local.php.
+ */
+return [
+  //  'debug'    => true,
+  //  'url'      => 'https://hirosan.sicodeit.com/public',
+  //  'timezone' => 'Asia/Colombo',
+];

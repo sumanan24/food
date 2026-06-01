@@ -22,35 +22,7 @@ class Router
 
     public function dispatch(string $uri, string $method): void
     {
-        // Already a clean path from index.php (?url=login)
-        if (!isset($_GET['url']) || $_GET['url'] === '') {
-            $uri = parse_url($uri, PHP_URL_PATH) ?? '/';
-
-            // Auto-detect install folder from index.php location
-            $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
-            $basePath = rtrim(dirname($scriptName), '/');
-            if ($basePath === '/' || $basePath === '.') {
-                $basePath = '';
-            }
-            if ($basePath !== '' && strpos($uri, $basePath) === 0) {
-                $uri = substr($uri, strlen($basePath)) ?: '/';
-            }
-
-            // Root URL rewrite (/food/ -> public/) leaves REQUEST_URI as /food/...
-            $projectBase = dirname($basePath);
-            if ($projectBase !== '' && $projectBase !== '/' && $projectBase !== '.'
-                && strpos($uri, $projectBase) === 0) {
-                $uri = substr($uri, strlen($projectBase)) ?: '/';
-            }
-
-            // Direct access: /food/public/index.php
-            if (strpos($uri, '/index.php') === 0) {
-                $uri = substr($uri, 10) ?: '/';
-            }
-        }
-
-        $uri = '/' . trim($uri, '/');
-        $uri = rtrim($uri, '/') ?: '/';
+        $uri = $this->normalizeUri($uri);
 
         foreach ($this->routes as $route) {
             $pattern = preg_replace('/\{([a-z]+)\}/', '([^/]+)', $route['path']);
@@ -66,6 +38,47 @@ class Router
 
         http_response_code(404);
         require dirname(__DIR__) . '/app/views/errors/404.php';
+    }
+
+    private function normalizeUri(string $uri): string
+    {
+        $uri = parse_url($uri, PHP_URL_PATH) ?? $uri;
+        if ($uri === '' || $uri[0] !== '/') {
+            $uri = '/' . ltrim($uri, '/');
+        }
+
+        $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+        $basePath = rtrim(dirname($scriptName), '/');
+        if ($basePath === '/' || $basePath === '.') {
+            $basePath = '';
+        }
+        if ($basePath !== '' && strpos($uri, $basePath) === 0) {
+            $uri = substr($uri, strlen($basePath)) ?: '/';
+        }
+
+        $projectBase = dirname($basePath);
+        if ($projectBase !== '' && $projectBase !== '/' && $projectBase !== '.'
+            && strpos($uri, $projectBase) === 0) {
+            $uri = substr($uri, strlen($projectBase)) ?: '/';
+        }
+
+        // /food/public/food/ → ?url=food — treat install folder name as app root
+        $projectFolder = $basePath !== '' ? basename(dirname($basePath)) : '';
+        if ($projectFolder !== '' && $projectFolder !== 'public' && $projectFolder !== 'www') {
+            $folderPath = '/' . $projectFolder;
+            if ($uri === $folderPath || $uri === $folderPath . '/') {
+                $uri = '/';
+            } elseif (strpos($uri, $folderPath . '/') === 0) {
+                $uri = substr($uri, strlen($folderPath)) ?: '/';
+            }
+        }
+
+        if (strpos($uri, '/index.php') === 0) {
+            $uri = substr($uri, 10) ?: '/';
+        }
+
+        $uri = '/' . trim($uri, '/');
+        return rtrim($uri, '/') ?: '/';
     }
 
     private function runMiddleware(array $middleware): void

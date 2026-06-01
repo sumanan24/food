@@ -1,12 +1,12 @@
 <?php
 /**
- * Production (cPanel): copy to database.local.php and fill in values from cPanel → MySQL Databases.
- * Example names — yours may look like sicodeit_food_shop / sicodeit_hirosan
+ * cPanel: copy to database.local.php and fill in from cPanel → MySQL Databases.
+ * Do not commit database.local.php.
  */
 return [
     'host'     => 'localhost',
-    'dbname'   => 'sicodeit_food_shop',
-    'username' => 'sicodeit_hirosan',
-    'password' => 'YOUR_CPANEL_DB_PASSWORD_HERE',
+    'dbname'   => 'cpaneluser_foodshop',
+    'username' => 'cpaneluser_fooduser',
+    'password' => 'your_strong_password',
     'charset'  => 'utf8mb4',
 ];
