@@ -1,5 +1,5 @@
 RewriteEngine On
-RewriteBase /food/public/
+# No RewriteBase — works for localhost (/food/public/) and production (/public/)
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
