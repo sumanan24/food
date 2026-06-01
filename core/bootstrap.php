@@ -79,5 +79,9 @@ set_error_handler(static function (int $severity, string $message, string $file,
     if (!(error_reporting() & $severity)) {
         return false;
     }
+    // Do not turn notices/deprecations into fatal 500 pages
+    if (in_array($severity, [E_NOTICE, E_USER_NOTICE, E_STRICT, E_DEPRECATED, E_USER_DEPRECATED], true)) {
+        return false;
+    }
     throw new ErrorException($message, 0, $severity, $file, $line);
 });

@@ -31,8 +31,25 @@ echo "DB user: {$config['username']}\n";
 
 try {
     $dsn = "mysql:host={$config['host']};dbname={$config['dbname']};charset={$config['charset']}";
-    new PDO($dsn, $config['username'], $config['password'], [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+    $pdo = new PDO($dsn, $config['username'], $config['password'], [
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_EMULATE_PREPARES   => false,
+    ]);
     echo "Database: CONNECTED\n";
+
+    $tables = ['users', 'sales', 'sale_items', 'products', 'activity_logs', 'settings'];
+    foreach ($tables as $table) {
+        $pdo->query("SELECT 1 FROM {$table} LIMIT 1");
+        echo "Table {$table}: OK\n";
+    }
+
+    // Same query as dashboard (was failing on cPanel with bound LIMIT)
+    $pdo->query(
+        "SELECT si.product_id, si.product_name, SUM(si.quantity) AS total_qty
+         FROM sale_items si GROUP BY si.product_id, si.product_name
+         ORDER BY total_qty DESC LIMIT 5"
+    );
+    echo "Dashboard query (top products): OK\n";
 } catch (Throwable $e) {
     echo "Database: FAILED — " . $e->getMessage() . "\n";
 }

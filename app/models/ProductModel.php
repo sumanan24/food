@@ -94,13 +94,13 @@ class ProductModel extends Model
 
     public function topSelling(int $limit = 5): array
     {
-        $stmt = $this->db->prepare(
+        // LIMIT cannot use bound params with native prepares on MariaDB/cPanel (causes 500 after login)
+        $limit = max(1, min(100, $limit));
+        $stmt = $this->db->query(
             "SELECT si.product_id, si.product_name, SUM(si.quantity) AS total_qty, SUM(si.line_total) AS total_sales
              FROM sale_items si GROUP BY si.product_id, si.product_name
-             ORDER BY total_qty DESC LIMIT ?"
+             ORDER BY total_qty DESC LIMIT {$limit}"
         );
-        $stmt->bindValue(1, $limit, \PDO::PARAM_INT);
-        $stmt->execute();
         return $stmt->fetchAll();
     }
 }
