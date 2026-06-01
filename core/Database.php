@@ -11,7 +11,10 @@ class Database
     public static function getInstance(): PDO
     {
         if (self::$instance === null) {
-            $config = require dirname(__DIR__) . '/config/database.php';
+            if (!function_exists('db_config')) {
+                require_once dirname(__DIR__) . '/core/bootstrap.php';
+            }
+            $config = db_config();
             $dsn = "mysql:host={$config['host']};dbname={$config['dbname']};charset={$config['charset']}";
             try {
                 self::$instance = new PDO($dsn, $config['username'], $config['password'], [
@@ -20,7 +23,11 @@ class Database
                     PDO::ATTR_EMULATE_PREPARES   => false,
                 ]);
             } catch (PDOException $e) {
-                die('Database connection failed: ' . htmlspecialchars($e->getMessage()));
+                error_log('[Food Shop] DB: ' . $e->getMessage());
+                if (function_exists('app_debug') && app_debug()) {
+                    die('Database connection failed: ' . htmlspecialchars($e->getMessage()));
+                }
+                die('Database connection failed. Configure config/database.local.php on the server.');
             }
         }
         return self::$instance;

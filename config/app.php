@@ -17,4 +17,5 @@ return [
     'currency'      => 'Rs.',
     'tax_rate'      => 0, // percentage, configurable in settings
     'csrf_token_name' => '_csrf_token',
+    'debug'           => false, // true or APP_DEBUG=1 on server to see error details
 ];

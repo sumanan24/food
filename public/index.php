@@ -8,6 +8,8 @@ declare(strict_types=1);
 define('ROOT_PATH', dirname(__DIR__));
 define('APP_PATH', ROOT_PATH . '/app');
 
+require ROOT_PATH . '/core/bootstrap.php';
+
 // Autoloader (folder names are lowercase; namespaces use PascalCase — required on Linux)
 spl_autoload_register(function (string $class): void {
     $map = [
@@ -38,12 +40,16 @@ use App\Models\UserModel;
 
 Session::start();
 
-// Remember me
+// Remember me (do not crash if DB is misconfigured)
 if (!isLoggedIn() && !empty($_COOKIE['remember_token'])) {
-    $user = (new UserModel())->findByRememberToken($_COOKIE['remember_token']);
-    if ($user) {
-        Session::set('user_id', $user['id']);
-        Session::set('user', ['id' => $user['id'], 'name' => $user['name'], 'email' => $user['email'], 'role' => $user['role']]);
+    try {
+        $user = (new UserModel())->findByRememberToken($_COOKIE['remember_token']);
+        if ($user) {
+            Session::set('user_id', $user['id']);
+            Session::set('user', ['id' => $user['id'], 'name' => $user['name'], 'email' => $user['email'], 'role' => $user['role']]);
+        }
+    } catch (Throwable $e) {
+        error_log('[Food Shop] remember_token: ' . $e->getMessage());
     }
 }
 

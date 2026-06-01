@@ -1,0 +1,12 @@
+<?php
+/**
+ * Copy to database.local.php on your server (cPanel) and fill in real values.
+ * Do not commit database.local.php — it is ignored by git.
+ */
+return [
+    'host'     => 'localhost',
+    'dbname'   => 'yourcpanel_user_food_shop',
+    'username' => 'yourcpanel_user_fooduser',
+    'password' => 'your_database_password',
+    'charset'  => 'utf8mb4',
+];

@@ -79,17 +79,21 @@ abstract class Controller
 
     protected function logActivity(string $action, string $module, ?string $details = null): void
     {
-        $user = currentUser();
-        $stmt = Database::getInstance()->prepare(
-            "INSERT INTO activity_logs (user_id, user_name, action, module, details, ip_address) VALUES (?,?,?,?,?,?)"
-        );
-        $stmt->execute([
-            $user['id'] ?? null,
-            $user['name'] ?? 'Guest',
-            $action,
-            $module,
-            $details,
-            $_SERVER['REMOTE_ADDR'] ?? '',
-        ]);
+        try {
+            $user = currentUser();
+            $stmt = Database::getInstance()->prepare(
+                "INSERT INTO activity_logs (user_id, user_name, action, module, details, ip_address) VALUES (?,?,?,?,?,?)"
+            );
+            $stmt->execute([
+                $user['id'] ?? null,
+                $user['name'] ?? 'Guest',
+                $action,
+                $module,
+                $details,
+                $_SERVER['REMOTE_ADDR'] ?? '',
+            ]);
+        } catch (\Throwable $e) {
+            error_log('[Food Shop] activity_log: ' . $e->getMessage());
+        }
     }
 }

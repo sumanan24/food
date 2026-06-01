@@ -8,10 +8,12 @@ class Session
         if (session_status() === PHP_SESSION_NONE) {
             $config = require dirname(__DIR__) . '/config/app.php';
             session_name($config['session_name']);
+            $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+                || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
             session_set_cookie_params([
                 'lifetime' => $config['session_lifetime'],
                 'path'     => '/',
-                'secure'   => isset($_SERVER['HTTPS']),
+                'secure'   => $secure,
                 'httponly' => true,
                 'samesite' => 'Lax',
             ]);
