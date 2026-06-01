@@ -36,6 +36,13 @@ class Router
                 $uri = substr($uri, strlen($basePath)) ?: '/';
             }
 
+            // Root URL rewrite (/food/ -> public/) leaves REQUEST_URI as /food/...
+            $projectBase = dirname($basePath);
+            if ($projectBase !== '' && $projectBase !== '/' && $projectBase !== '.'
+                && strpos($uri, $projectBase) === 0) {
+                $uri = substr($uri, strlen($projectBase)) ?: '/';
+            }
+
             // Direct access: /food/public/index.php
             if (strpos($uri, '/index.php') === 0) {
                 $uri = substr($uri, 10) ?: '/';
