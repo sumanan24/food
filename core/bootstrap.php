@@ -54,7 +54,12 @@ function app_handle_exception(Throwable $e): void
     echo '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"></head>';
     echo '<body class="d-flex align-items-center justify-content-center min-vh-100"><div class="text-center p-4">';
     echo '<h1 class="text-danger">Something went wrong</h1>';
-    echo '<p class="text-muted">The server could not complete your request. Check database settings in cPanel and try again.</p>';
+    echo '<p class="text-muted">The server could not complete your request.</p>';
+    if (str_contains($e->getMessage(), 'Column not found') || str_contains($e->getMessage(), '42S22')) {
+        echo '<p class="small">Database schema is outdated. In phpMyAdmin run <strong>database/cpanel_upgrade.sql</strong> or re-import <strong>database/food_shop.sql</strong>.</p>';
+    } else {
+        echo '<p class="small">Check <strong>config/database.local.php</strong> in cPanel, or run <strong>public/check.php</strong> for details.</p>';
+    }
     echo '<a href="' . htmlspecialchars(app_url_safe() . '/login') . '" class="btn btn-primary">Back to Login</a>';
     echo '</div></body></html>';
 }

@@ -43,13 +43,17 @@ try {
         echo "Table {$table}: OK\n";
     }
 
-    // Same query as dashboard (was failing on cPanel with bound LIMIT)
     $pdo->query(
-        "SELECT si.product_id, si.product_name, SUM(si.quantity) AS total_qty
-         FROM sale_items si GROUP BY si.product_id, si.product_name
+        "SELECT si.product_id, p.name AS product_name, SUM(si.quantity) AS total_qty
+         FROM sale_items si
+         INNER JOIN products p ON p.id = si.product_id
+         GROUP BY si.product_id, p.name
          ORDER BY total_qty DESC LIMIT 5"
     );
     echo "Dashboard query (top products): OK\n";
+
+    $cols = $pdo->query("SHOW COLUMNS FROM sale_items LIKE 'product_name'")->fetch();
+    echo $cols ? "Column sale_items.product_name: OK\n" : "Column sale_items.product_name: MISSING — run database/cpanel_upgrade.sql in phpMyAdmin\n";
 } catch (Throwable $e) {
     echo "Database: FAILED — " . $e->getMessage() . "\n";
 }

@@ -141,7 +141,7 @@ Steps 3–7 are the same. Root `.htaccess` sends `/` to `public/`.
 | Problem | Fix |
 |---------|-----|
 | 500 on `/public/login` | Remove `RewriteBase /food/public/` from `public/.htaccess`; use repo version |
-| “Something went wrong” after login | Upload latest `app/models/ProductModel.php`; import full SQL |
+| “Something went wrong” after login | Upload latest `app/models/ProductModel.php`; in phpMyAdmin run `database/cpanel_upgrade.sql` if `check.php` says `product_name` is missing |
 | Controller not found | Upload latest `public/index.php` (Linux case-sensitive autoload) |
 | Database connection failed | Fix `database.local.php`; check user added to database |
 | 404 on all pages | Enable `mod_rewrite`; check `public/.htaccess` exists |
