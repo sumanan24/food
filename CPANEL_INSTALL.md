@@ -125,6 +125,19 @@ Steps 3–7 are the same. Root `.htaccess` sends `/` to `public/`.
 3. Import database once in phpMyAdmin
 4. Set PHP 8+ and document root to `public/` if possible
 
+### Error: `415 Unsupported Media Type` (openresty) when using Git
+
+This usually comes from **cPanel’s Git UI**, not from the Food Shop login page. The hosting proxy rejects the deploy API request.
+
+**Workarounds:**
+
+1. **File Manager** or **FTP** — upload the project folder manually (most reliable).
+2. Git clone on your PC, then upload `public_html` via File Manager.
+3. In Git Version Control, use **Pull** only (not a broken deploy hook); or ask your host (sicodeit.com) to fix openresty rules for cPanel Git.
+4. Do **not** send JSON POST to PHP routes — the app uses normal forms and `multipart/form-data` for checkout (already correct).
+
+After upload, run `database/cpanel_upgrade.sql` in phpMyAdmin if login/dashboard fails.
+
 ---
 
 ## Files you must configure on the server

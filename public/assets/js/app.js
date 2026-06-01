@@ -1,6 +1,38 @@
 /**
  * Food Shop Management - Main JS
  */
+
+// Required by some hosts (openresty / ModSecurity) for /api/* requests
+if (typeof jQuery !== 'undefined') {
+    jQuery.ajaxSetup({
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+        },
+        beforeSend: function (xhr) {
+            if (window.CSRF_TOKEN) {
+                xhr.setRequestHeader('X-CSRF-TOKEN', window.CSRF_TOKEN);
+            }
+        },
+    });
+}
+
+/** fetch() wrapper with headers accepted by cPanel / openresty proxies */
+window.apiFetch = function (url, options) {
+    options = options || {};
+    const headers = Object.assign(
+        {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+        options.headers || {}
+    );
+    if (window.CSRF_TOKEN && !headers['X-CSRF-TOKEN']) {
+        headers['X-CSRF-TOKEN'] = window.CSRF_TOKEN;
+    }
+    return fetch(url, Object.assign({}, options, { headers }));
+};
+
 function confirmDelete(form) {
     if (!confirm('Are you sure you want to delete this item?')) return false;
     return true;

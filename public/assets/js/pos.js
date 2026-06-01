@@ -179,9 +179,7 @@ document.getElementById('barcodeInput')?.addEventListener('keypress', function (
     e.preventDefault();
     const code = this.value.trim();
     if (!code) return;
-    fetch((window.APP_URL || '') + '/api/products/barcode/' + encodeURIComponent(code), {
-        headers: { 'X-CSRF-TOKEN': window.CSRF_TOKEN }
-    })
+    (window.apiFetch || fetch)((window.APP_URL || '') + '/api/products/barcode/' + encodeURIComponent(code))
         .then(r => r.json())
         .then(res => {
             if (res.success) {
@@ -220,6 +218,12 @@ $('#checkoutForm').on('submit', function (e) {
         data: formData,
         processData: false,
         contentType: false,
+        dataType: 'json',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': window.CSRF_TOKEN || '',
+        },
         success(res) {
             if (res.success) {
                 showToast('Sale completed! Change: ' + formatMoney(Math.max(0, paid - grand)));

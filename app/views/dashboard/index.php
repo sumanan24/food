@@ -87,7 +87,7 @@ $pageScript = '<script>
 document.addEventListener("DOMContentLoaded", function() {
     let chart;
     function loadChart(period) {
-        fetch(APP_URL + "/api/dashboard/stats?period=" + period)
+        (window.apiFetch || fetch)(APP_URL + "/api/dashboard/stats?period=" + period)
             .then(r => r.json())
             .then(res => {
                 const ctx = document.getElementById("incomeChart");
