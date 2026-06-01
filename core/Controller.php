@@ -73,7 +73,7 @@ abstract class Controller
         $token = $_POST[$config['csrf_token_name']] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
         if (!Security::validateCsrf($token)) {
             Session::flash('error', 'Invalid security token. Please try again.');
-            redirect($_SERVER['HTTP_REFERER'] ?? 'dashboard');
+            redirect(safe_redirect_target('login'));
         }
     }
 

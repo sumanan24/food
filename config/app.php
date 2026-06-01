@@ -4,6 +4,7 @@
  */
 return [
     'name'          => 'Food Shop Management',
+    // Overridden at runtime by app_url() from HTTP_HOST; set APP_URL env on server if needed
     'url'           => 'http://localhost/food/public',
     'timezone'      => 'Asia/Colombo',
     'session_name'  => 'FOOD_SHOP_SESSION',
