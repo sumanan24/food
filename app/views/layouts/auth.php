@@ -10,9 +10,7 @@ $error = Session::flash('error');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($title ?? 'Login') ?> - <?= e($config['name']) ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="<?= url('assets/css/app.css') ?>" rel="stylesheet">
+    <?php require VIEW_PATH . '/partials/head-assets.php'; ?>
 </head>
 <body class="auth-body">
     <div class="auth-wrapper">
@@ -32,6 +30,6 @@ $error = Session::flash('error');
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <?php require VIEW_PATH . '/partials/footer-scripts.php'; ?>
 </body>
 </html>

@@ -15,10 +15,8 @@ $currentPath = trim($_GET['url'] ?? '', '/');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($title ?? 'Dashboard') ?> - <?= e($config['name']) ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-    <link href="<?= url('assets/css/app.css') ?>" rel="stylesheet">
+    <?php require VIEW_PATH . '/partials/head-assets.php'; ?>
+    <link href="<?= asset('vendor/datatables/css/dataTables.bootstrap5.min.css') ?>" rel="stylesheet">
 </head>
 <body>
 <div class="d-flex" id="wrapper">
@@ -77,11 +75,11 @@ $currentPath = trim($_GET['url'] ?? '', '/');
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="<?= url('assets/js/app.js') ?>"></script>
+<?php require VIEW_PATH . '/partials/footer-scripts.php'; ?>
+<script src="<?= asset('vendor/jquery/jquery.min.js') ?>"></script>
+<script src="<?= asset('vendor/datatables/js/jquery.dataTables.min.js') ?>"></script>
+<script src="<?= asset('vendor/datatables/js/dataTables.bootstrap5.min.js') ?>"></script>
+<script src="<?= asset('vendor/chartjs/chart.umd.min.js') ?>"></script>
+<script src="<?= asset('js/app.js') ?>"></script>
 </body>
 </html>

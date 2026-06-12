@@ -19,7 +19,11 @@ class InstallController extends Controller
     public function index(): void
     {
         if (file_exists(CONFIG_PATH . '/database.local.php')) {
-            $this->redirect('/login');
+            $userModel = new User();
+            if ($userModel->countAll() > 0) {
+                $this->redirect('/login');
+            }
+            Session::set('install_step', 2);
         }
 
         $this->view('install/index', [
@@ -64,10 +68,11 @@ class InstallController extends Controller
 
             Database::reset();
             Database::runSqlFile(ROOT_PATH . '/sql/schema.sql');
+            Database::runSqlFile(ROOT_PATH . '/sql/seed.sql');
 
             Session::set('install_db', $config);
             Session::set('install_step', 2);
-            Session::flash('success', 'Database configured and tables created successfully.');
+            Session::flash('success', 'Database configured. Default admin: admin@foodshop.com / admin123');
         } catch (\Throwable $e) {
             @unlink(CONFIG_PATH . '/database.local.php');
             Session::flash('error', 'Installation failed: ' . $e->getMessage());

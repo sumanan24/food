@@ -20,6 +20,11 @@ function url(string $path = ''): string
     return View::url($path);
 }
 
+function asset(string $path): string
+{
+    return View::asset($path);
+}
+
 function csrf_field(): string
 {
     return CSRF::field();

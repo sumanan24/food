@@ -6,8 +6,20 @@ define('ROOT_PATH', dirname(__DIR__));
 define('APP_PATH', ROOT_PATH . '/app');
 define('CONFIG_PATH', ROOT_PATH . '/config');
 define('VIEW_PATH', APP_PATH . '/views');
+define('PUBLIC_PATH', __DIR__);
 
-require ROOT_PATH . '/vendor/autoload.php';
+$basePath = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
+define('BASE_URL', rtrim($basePath, '/'));
+
+$autoload = ROOT_PATH . '/vendor/autoload.php';
+if (!file_exists($autoload)) {
+    http_response_code(500);
+    echo '<h1>Dependencies not installed</h1>';
+    echo '<p>Run <code>composer install</code> in the project folder:</p>';
+    echo '<pre>cd ' . htmlspecialchars(ROOT_PATH, ENT_QUOTES, 'UTF-8') . "\ncomposer install</pre>";
+    exit;
+}
+require $autoload;
 require_once APP_PATH . '/Helpers/functions.php';
 
 spl_autoload_register(function (string $class): void {

@@ -43,7 +43,12 @@ class View
 
     public static function baseUrl(): string
     {
-        return rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\');
+        if (defined('BASE_URL')) {
+            return BASE_URL;
+        }
+
+        $base = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
+        return rtrim($base, '/');
     }
 
     public static function url(string $path = ''): string
@@ -51,5 +56,10 @@ class View
         $base = self::baseUrl();
         $path = ltrim($path, '/');
         return $base . ($path !== '' ? '/' . $path : '');
+    }
+
+    public static function asset(string $path): string
+    {
+        return self::url('assets/' . ltrim($path, '/'));
     }
 }

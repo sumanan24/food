@@ -75,10 +75,14 @@ class Item extends Model
     public function decreaseStock(int $id, float $quantity): bool
     {
         $stmt = $this->db->prepare(
-            'UPDATE items SET current_stock = current_stock - :qty 
-             WHERE id = :id AND current_stock >= :qty'
+            'UPDATE items SET current_stock = current_stock - :qty
+             WHERE id = :id AND current_stock >= :min_qty'
         );
-        return $stmt->execute(['id' => $id, 'qty' => $quantity]);
+        return $stmt->execute([
+            'id' => $id,
+            'qty' => $quantity,
+            'min_qty' => $quantity,
+        ]);
     }
 
     public function nameExists(string $name, ?int $excludeId = null): bool
