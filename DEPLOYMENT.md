@@ -27,7 +27,9 @@ food/
    ```
    /home/username/foodshop/public
    ```
-3. SSH into server (or use cPanel Terminal) and run:
+3. **Dependencies auto-install on first visit** — upload files without `vendor/` and open your site URL. PHP will download TCPDF automatically (or run Composer if shell access is available).
+
+   Optional manual install via SSH:
    ```bash
    cd /home/username/foodshop
    composer install --no-dev --optimize-autoloader
@@ -36,7 +38,9 @@ food/
    ```bash
    chmod 755 public
    chmod 775 config
+   chmod 775 storage
    ```
+   The project root must be writable so `vendor/` can be created during auto-install.
 5. Visit `https://yourdomain.com/install` and complete the wizard.
 
 ## Option B: Subfolder in `public_html`
@@ -132,7 +136,8 @@ return [
 | 404 on all pages | Enable `mod_rewrite`; check `.htaccess` in `public/` |
 | Blank page | Enable PHP error log; verify PHP 8.0+ |
 | Database connection failed | Verify cPanel DB name includes prefix (e.g. `user_foodshop`) |
-| PDF download fails | Run `composer install` to install TCPDF |
+| PDF download fails | Refresh the site once (auto-install) or run `composer install`; ensure `vendor/` is writable |
+| Dependencies not installed | Set `chmod 775` on project root and `storage/`; enable PHP `zip` and `curl` extensions |
 | CSS/JS not loading | Check document root points to `public/` |
 
 ## Support Files

@@ -4,3 +4,4 @@ backups/*.sql
 tmp_cookies.txt
 /vendor/
 composer.lock
+/storage/.dependency-install.lock

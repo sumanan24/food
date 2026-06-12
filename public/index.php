@@ -13,11 +13,22 @@ define('BASE_URL', rtrim($basePath, '/'));
 
 $autoload = ROOT_PATH . '/vendor/autoload.php';
 if (!file_exists($autoload)) {
-    http_response_code(500);
-    echo '<h1>Dependencies not installed</h1>';
-    echo '<p>Run <code>composer install</code> in the project folder:</p>';
-    echo '<pre>cd ' . htmlspecialchars(ROOT_PATH, ENT_QUOTES, 'UTF-8') . "\ncomposer install</pre>";
-    exit;
+    require_once APP_PATH . '/Core/DependencyInstaller.php';
+    $dependencyResult = (new \App\Core\DependencyInstaller(ROOT_PATH))->install();
+
+    if (!file_exists($autoload)) {
+        http_response_code(500);
+        header('Content-Type: text/html; charset=UTF-8');
+        echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Installing dependencies</title>';
+        echo '<link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.min.css"></head><body class="p-4">';
+        echo '<div class="container" style="max-width:640px;">';
+        echo '<h1 class="h4">Could not install dependencies automatically</h1>';
+        echo '<p class="text-danger">' . htmlspecialchars($dependencyResult['message'], ENT_QUOTES, 'UTF-8') . '</p>';
+        echo '<p>Via SSH/Terminal in cPanel, run:</p>';
+        echo '<pre class="bg-light p-3">cd ' . htmlspecialchars(ROOT_PATH, ENT_QUOTES, 'UTF-8') . "\ncomposer install</pre>";
+        echo '<p class="mb-0"><a href="">Retry auto-install</a></p></div></body></html>';
+        exit;
+    }
 }
 require $autoload;
 require_once APP_PATH . '/Helpers/functions.php';
