@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Core\PdfLoader;
 use TCPDF;
 
 class PdfReportService
 {
     public function generate(array $report, array $config): void
     {
+        PdfLoader::load();
         $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
         $pdf->SetCreator($config['name']);
         $pdf->SetAuthor($config['name']);

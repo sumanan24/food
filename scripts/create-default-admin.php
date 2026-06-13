@@ -8,26 +8,8 @@ declare(strict_types=1);
  */
 
 define('ROOT_PATH', dirname(__DIR__));
-define('APP_PATH', ROOT_PATH . '/app');
-define('CONFIG_PATH', ROOT_PATH . '/config');
 
-require ROOT_PATH . '/vendor/autoload.php';
-
-spl_autoload_register(function (string $class): void {
-    $prefix = 'App\\';
-    $baseDir = APP_PATH . '/';
-
-    if (strncmp($prefix, $class, strlen($prefix)) !== 0) {
-        return;
-    }
-
-    $relative = substr($class, strlen($prefix));
-    $file = $baseDir . str_replace('\\', '/', $relative) . '.php';
-
-    if (file_exists($file)) {
-        require $file;
-    }
-});
+require ROOT_PATH . '/bootstrap.php';
 
 use App\Core\Database;
 use App\Models\User;
