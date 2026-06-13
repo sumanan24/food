@@ -1,26 +1,29 @@
-<div class="page-header">
-    <h1 class="h3 mb-0">Change Password</h1>
-</div>
-
-<div class="row justify-content-center">
-    <div class="col-lg-6">
-        <div class="table-card">
-            <form method="POST" action="<?= url('change-password') ?>">
-                <?= csrf_field() ?>
-                <div class="mb-3">
-                    <label for="current_password" class="form-label">Current Password</label>
-                    <input type="password" class="form-control" id="current_password" name="current_password" required>
-                </div>
-                <div class="mb-3">
-                    <label for="new_password" class="form-label">New Password</label>
-                    <input type="password" class="form-control" id="new_password" name="new_password" minlength="6" required>
-                </div>
-                <div class="mb-3">
-                    <label for="confirm_password" class="form-label">Confirm New Password</label>
-                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" minlength="6" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Update Password</button>
-            </form>
+<div class="transaction-page account-page">
+    <div class="list-toolbar">
+        <div class="list-toolbar-info">
+            <span class="list-toolbar-label"><i class="bi bi-key me-1"></i> Account Security</span>
+            <strong class="list-toolbar-value">Change password</strong>
         </div>
+    </div>
+
+    <div class="table-card form-card">
+        <form method="POST" action="<?= url('change-password') ?>">
+            <?= csrf_field() ?>
+            <div class="mb-3">
+                <label for="current_password" class="form-label">Current Password *</label>
+                <input type="password" class="form-control" id="current_password" name="current_password" required>
+            </div>
+            <div class="mb-3">
+                <label for="new_password" class="form-label">New Password *</label>
+                <input type="password" class="form-control" id="new_password" name="new_password" minlength="6" placeholder="Min. 6 characters" required>
+            </div>
+            <div class="mb-4">
+                <label for="confirm_password" class="form-label">Confirm New Password *</label>
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password" minlength="6" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 w-sm-auto">
+                <i class="bi bi-check-lg me-1"></i> Update Password
+            </button>
+        </form>
     </div>
 </div>

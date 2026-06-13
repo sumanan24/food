@@ -3,6 +3,7 @@ use App\Core\Auth;
 $symbol = $config['currency_symbol'] ?? 'Rs.';
 ?>
 
+<div class="dashboard-page">
 <div class="dashboard-hero animate-in">
     <div class="dashboard-hero-content">
         <h2>Hello, <?= e(explode(' ', Auth::user()['name'] ?? 'User')[0]) ?> 👋</h2>
@@ -19,7 +20,7 @@ $symbol = $config['currency_symbol'] ?? 'Rs.';
     <div class="col-6 col-xl-3">
         <div class="card stat-card stat-sales">
             <div class="card-body">
-                <div class="stat-icon"><i class="bi bi-cash-coin"></i></div>
+                <div class="stat-icon d-none d-sm-flex"><i class="bi bi-cash-coin"></i></div>
                 <div>
                     <div class="stat-label">Today Sales</div>
                     <div class="stat-value"><?= $symbol ?> <?= money($summary['today_sales']) ?></div>
@@ -30,7 +31,7 @@ $symbol = $config['currency_symbol'] ?? 'Rs.';
     <div class="col-6 col-xl-3">
         <div class="card stat-card stat-purchases">
             <div class="card-body">
-                <div class="stat-icon"><i class="bi bi-cart-plus"></i></div>
+                <div class="stat-icon d-none d-sm-flex"><i class="bi bi-cart-plus"></i></div>
                 <div>
                     <div class="stat-label">Purchases</div>
                     <div class="stat-value"><?= $symbol ?> <?= money($summary['today_purchases']) ?></div>
@@ -41,7 +42,7 @@ $symbol = $config['currency_symbol'] ?? 'Rs.';
     <div class="col-6 col-xl-3">
         <div class="card stat-card stat-expenses">
             <div class="card-body">
-                <div class="stat-icon"><i class="bi bi-wallet2"></i></div>
+                <div class="stat-icon d-none d-sm-flex"><i class="bi bi-wallet2"></i></div>
                 <div>
                     <div class="stat-label">Expenses</div>
                     <div class="stat-value"><?= $symbol ?> <?= money($summary['today_expenses']) ?></div>
@@ -52,7 +53,7 @@ $symbol = $config['currency_symbol'] ?? 'Rs.';
     <div class="col-6 col-xl-3">
         <div class="card stat-card stat-profit">
             <div class="card-body">
-                <div class="stat-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                <div class="stat-icon d-none d-sm-flex"><i class="bi bi-graph-up-arrow"></i></div>
                 <div>
                     <div class="stat-label">Profit</div>
                     <div class="stat-value <?= $summary['today_profit'] >= 0 ? 'text-profit' : 'text-loss' ?>">
@@ -159,3 +160,4 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+</div>

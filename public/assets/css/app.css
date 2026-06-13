@@ -1,4 +1,4 @@
-/* Food Shop Inventory — v2.0.0 | Mobile Creative Dashboard */
+/* Food Shop Inventory — v2.0.8 | Mobile Creative Dashboard */
 
 :root {
     --primary: #ff6b35;
@@ -1163,7 +1163,176 @@ h1, h2, h3, h4, h5, h6, .font-display {
 
 .gap-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
+/* ---- Report Show (Daily / Weekly / Monthly) ---- */
+.report-show {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.report-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    padding: 1rem 1.125rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+}
+
+.report-period {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.report-period-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+}
+
+.report-period-value {
+    font-family: var(--font-display);
+    font-size: clamp(0.95rem, 3.5vw, 1.15rem);
+    color: var(--dark);
+    word-break: break-word;
+}
+
+.report-actions {
+    width: auto;
+    flex-shrink: 0;
+}
+
+.report-summary .stat-card .card-body {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1rem;
+}
+
+@media (min-width: 576px) {
+    .report-summary .stat-card .card-body {
+        flex-direction: row;
+        align-items: center;
+        padding: 1.25rem;
+    }
+}
+
+.report-summary .stat-value {
+    font-size: clamp(0.95rem, 3.2vw, 1.25rem);
+    word-break: break-word;
+}
+
+.report-section {
+    overflow: hidden;
+}
+
+.report-mobile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.report-item-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.875rem 1rem;
+}
+
+.report-item-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.report-item-title {
+    font-size: 0.9375rem;
+    color: var(--dark);
+    line-height: 1.35;
+    flex: 1;
+    min-width: 0;
+    word-break: break-word;
+}
+
+.report-item-amount {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.9375rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.report-item-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.report-item-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.report-item-meta i {
+    color: var(--primary);
+    font-size: 0.85rem;
+}
+
+@media (max-width: 991.98px) {
+    .report-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .report-actions {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+
+    .report-actions .btn {
+        width: 100%;
+        justify-content: center;
+        margin: 0 !important;
+    }
+
+    .report-summary {
+        margin-bottom: 1rem !important;
+    }
+
+    .table-card.report-section {
+        padding: 1rem;
+    }
+
+    .report-section .card-title {
+        font-size: 1rem;
+        margin-bottom: 0.875rem;
+    }
+}
+
 @media (max-width: 575.98px) {
+    .report-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .report-summary .stat-label {
+        font-size: 0.68rem;
+    }
+
     .page-header .btn {
         width: 100%;
         justify-content: center;
@@ -1176,5 +1345,367 @@ h1, h2, h3, h4, h5, h6, .font-display {
     .page-header-actions .btn {
         flex: 1;
         min-width: 0;
+    }
+}
+
+/* ---- List / Inventory pages ---- */
+.list-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    padding: 1rem 1.125rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+}
+
+.list-toolbar-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.list-toolbar-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+}
+
+.list-toolbar-value {
+    font-family: var(--font-display);
+    font-size: clamp(0.95rem, 3.5vw, 1.15rem);
+    color: var(--dark);
+    word-break: break-word;
+}
+
+.list-toolbar-meta {
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    margin-top: 0.15rem;
+}
+
+.list-toolbar-actions {
+    width: auto;
+}
+
+.transaction-page {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.transaction-item-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.transaction-item-no {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: var(--surface-2);
+    padding: 0.15rem 0.45rem;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.transaction-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem 0.75rem;
+}
+
+.transaction-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+}
+
+.transaction-detail-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+}
+
+.transaction-detail span:last-child {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--dark);
+    word-break: break-word;
+}
+
+.transaction-notes {
+    margin-top: 0.625rem;
+    padding-top: 0.625rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+}
+
+.transaction-total-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.125rem;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(46, 196, 182, 0.08));
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+
+.transaction-total-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.transaction-total-value {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    color: var(--primary);
+}
+
+.filter-card {
+    padding: 1rem 1.125rem !important;
+}
+
+.filter-form-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+@media (max-width: 991.98px) {
+    .list-toolbar-actions {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+
+    .list-toolbar-actions .btn {
+        width: 100%;
+        justify-content: center;
+        margin: 0 !important;
+    }
+
+    .list-toolbar-actions:has(.btn:only-child) {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-form-actions {
+        width: 100%;
+    }
+
+    .transaction-detail-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 575.98px) {
+    .list-toolbar-actions {
+        grid-template-columns: 1fr;
+    }
+}
+
+.inventory-page {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.inventory-mobile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.inventory-item-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.inventory-item-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+    margin-bottom: 0.875rem;
+}
+
+.inventory-item-no {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: var(--surface-2);
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+}
+
+.inventory-item-name {
+    flex: 1;
+    min-width: 0;
+    font-size: 1rem;
+    color: var(--dark);
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.inventory-item-header .stock-badge {
+    margin-left: auto;
+    font-size: 0.75rem;
+}
+
+.inventory-item-prices {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 0.875rem;
+}
+
+.inventory-price-box {
+    background: var(--surface-2);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 0.625rem;
+    text-align: center;
+    min-width: 0;
+}
+
+.inventory-price-label {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    margin-bottom: 0.15rem;
+}
+
+.inventory-price-value {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(0.78rem, 2.8vw, 0.9rem);
+    word-break: break-word;
+}
+
+.inventory-item-actions {
+    display: flex;
+    gap: 0.5rem;
+    padding-top: 0.25rem;
+    border-top: 1px solid var(--border);
+}
+
+@media (max-width: 991.98px) {
+    .list-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .list-toolbar-actions {
+        width: 100%;
+    }
+
+    .list-toolbar-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .inventory-item-header .stock-badge {
+        margin-left: 0;
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 380px) {
+    .inventory-item-prices {
+        grid-template-columns: 1fr;
+    }
+
+    .inventory-price-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-align: left;
+    }
+
+    .inventory-price-label {
+        margin-bottom: 0;
+    }
+}
+
+/* ---- Dashboard mobile ---- */
+.dashboard-page {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.report-yearly-btn {
+    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    border: none;
+}
+
+.report-yearly-btn:hover {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    border: none;
+}
+
+.error-card {
+    max-width: 420px;
+    width: calc(100% - 2rem);
+    margin: 0 auto;
+}
+
+.error-code {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 12vw, 4.5rem);
+    font-weight: 800;
+    color: var(--dark);
+    margin: 0;
+    line-height: 1;
+}
+
+@media (max-width: 575.98px) {
+    .dashboard-hero {
+        padding: 1.25rem 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .dashboard-hero .quick-actions {
+        flex-direction: column;
+    }
+
+    .dashboard-hero .quick-action-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .dashboard-page .stat-card .card-body {
+        padding: 0.875rem;
+        gap: 0;
+    }
+
+    .dashboard-page .stat-label {
+        font-size: 0.68rem;
+    }
+
+    .dashboard-page .stat-value {
+        font-size: clamp(0.85rem, 3.5vw, 1rem);
     }
 }
