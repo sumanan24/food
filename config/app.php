@@ -8,4 +8,5 @@ return [
     'currency' => 'LKR',
     'currency_symbol' => 'Rs.',
     'per_page' => 25,
+    'asset_version' => '2.0.0',
 ];
