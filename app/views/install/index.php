@@ -1,10 +1,6 @@
 <?php if ($step === 1): ?>
-    <div class="mb-4">
-        <div class="progress" style="height:8px;">
-            <div class="progress-bar" style="width:50%"></div>
-        </div>
-        <p class="text-center text-muted small mt-2">Step 1 of 2 — Database Setup</p>
-    </div>
+    <div class="install-progress"><div class="install-progress-bar" style="width:50%"></div></div>
+    <p class="install-step-label">Step 1 of 2 — Database Setup</p>
 
     <form method="POST" action="<?= url('install/database') ?>">
         <div class="mb-3">
@@ -18,7 +14,7 @@
         <div class="mb-3">
             <label class="form-label">Database Name *</label>
             <input type="text" name="database" class="form-control" value="<?= e($dbConfig['database'] ?? 'foodshop') ?>" required>
-            <div class="form-text">Database will be created if it does not exist.</div>
+            <div class="form-text">Created automatically if it doesn't exist.</div>
         </div>
         <div class="mb-3">
             <label class="form-label">Username *</label>
@@ -28,51 +24,44 @@
             <label class="form-label">Password</label>
             <input type="password" name="password" class="form-control">
         </div>
-        <button type="submit" class="btn btn-primary w-100">
-            <i class="bi bi-database me-1"></i> Setup Database
+        <button type="submit" class="btn btn-primary btn-auth">
+            <i class="bi bi-database me-2"></i> Setup Database
         </button>
     </form>
 <?php else: ?>
-    <div class="mb-4">
-        <div class="progress" style="height:8px;">
-            <div class="progress-bar" style="width:100%"></div>
-        </div>
-        <p class="text-center text-muted small mt-2">Step 2 of 2 — Admin Account</p>
+    <div class="install-progress"><div class="install-progress-bar" style="width:100%"></div></div>
+    <p class="install-step-label">Step 2 of 2 — Admin Account</p>
+
+    <div class="alert alert-app alert-success mb-4">
+        <strong>Default admin ready:</strong><br>
+        <code>admin@foodshop.com</code> / <code>admin123</code>
     </div>
 
-    <div class="alert alert-info">
-        <strong>Default admin (already created):</strong><br>
-        Email: <code>admin@foodshop.com</code><br>
-        Password: <code>admin123</code>
-    </div>
+    <a href="<?= url('login') ?>" class="btn btn-primary btn-auth mb-3">
+        <i class="bi bi-box-arrow-in-right me-2"></i> Login Now
+    </a>
 
-    <div class="d-grid gap-2 mb-4">
-        <a href="<?= url('login') ?>" class="btn btn-success">
-            <i class="bi bi-box-arrow-in-right me-1"></i> Login with Default Admin
-        </a>
-    </div>
-
-    <p class="text-muted small text-center mb-3">— or create a custom admin account —</p>
+    <p class="text-muted small text-center mb-3">— or create custom admin —</p>
 
     <form method="POST" action="<?= url('install/admin') ?>">
         <div class="mb-3">
-            <label class="form-label">Full Name *</label>
+            <label class="form-label">Full Name</label>
             <input type="text" name="name" class="form-control" value="Administrator">
         </div>
         <div class="mb-3">
-            <label class="form-label">Email *</label>
+            <label class="form-label">Email</label>
             <input type="email" name="email" class="form-control" value="admin@foodshop.com">
         </div>
         <div class="mb-3">
-            <label class="form-label">Password *</label>
+            <label class="form-label">Password</label>
             <input type="password" name="password" class="form-control" minlength="6">
         </div>
         <div class="mb-4">
-            <label class="form-label">Confirm Password *</label>
+            <label class="form-label">Confirm Password</label>
             <input type="password" name="confirm_password" class="form-control" minlength="6">
         </div>
-        <button type="submit" class="btn btn-outline-primary w-100">
-            <i class="bi bi-check-circle me-1"></i> Create Custom Admin
+        <button type="submit" class="btn btn-outline-primary btn-auth">
+            Create Custom Admin
         </button>
     </form>
 <?php endif; ?>
