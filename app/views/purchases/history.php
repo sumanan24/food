@@ -23,16 +23,20 @@ $filterLabel = $filterDate ? e($filterDate) : 'All dates';
     </div>
 
     <div class="table-card filter-card mb-3">
+        <div class="list-filters-head">
+            <span class="list-filters-title"><i class="bi bi-calendar3 me-1"></i> Filter by date</span>
+        </div>
         <form method="GET" action="<?= url('purchases/history') ?>" class="filter-form-mobile">
             <div class="row g-2 align-items-end">
-                <div class="col-12 col-sm-auto flex-grow-1">
-                    <label class="form-label">Filter by date</label>
+                <div class="col-12 col-sm">
+                    <label class="form-label">Date</label>
                     <input type="date" name="date" class="form-control" value="<?= e($filterDate ?? '') ?>">
                 </div>
                 <div class="col-12 col-sm-auto">
+                    <label class="form-label d-none d-sm-block">&nbsp;</label>
                     <div class="filter-form-actions">
-                        <button type="submit" class="btn btn-primary flex-fill">Filter</button>
-                        <a href="<?= url('purchases/history') ?>" class="btn btn-outline-secondary flex-fill">Clear</a>
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                        <a href="<?= url('purchases/history') ?>" class="btn btn-outline-secondary">Clear</a>
                     </div>
                 </div>
             </div>

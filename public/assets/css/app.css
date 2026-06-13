@@ -1481,53 +1481,127 @@ h1, h2, h3, h4, h5, h6, .font-display {
 
 .filter-card {
     padding: 1rem 1.125rem !important;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.filter-form-mobile {
+    width: 100%;
 }
 
 .filter-form-actions {
     display: flex;
     gap: 0.5rem;
+    width: 100%;
+}
+
+.filter-form-actions .btn {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.list-filters-head {
+    margin-bottom: 0.75rem;
+}
+
+.list-filters-title {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
 }
 
 .list-filters-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    gap: 0.75rem;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
 }
 
-.list-filter-search {
-    flex: 1 1 220px;
-    min-width: 0;
-}
-
-.list-filter-field {
-    flex: 1 1 160px;
-    min-width: 0;
-}
-
+.list-filter-search,
+.list-filter-field,
 .list-filter-actions {
-    flex: 0 0 auto;
+    min-width: 0;
 }
 
 .list-filter-actions .btn {
     white-space: nowrap;
 }
 
+.list-filters .form-label {
+    font-size: 0.8125rem;
+    margin-bottom: 0.35rem;
+}
+
+.list-filters .form-control,
+.list-filters .form-select {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.list-filters .input-group {
+    width: 100%;
+    min-width: 0;
+}
+
 .list-filters .input-group-text {
     background: var(--surface-2);
     border-color: var(--border);
     color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.list-filter-status {
+    padding-top: 0.25rem;
+    border-top: 1px solid var(--border);
+}
+
+.report-section .list-filters {
+    margin-bottom: 0.875rem !important;
+    padding: 0.875rem 1rem !important;
+}
+
+@media (max-width: 991.98px) {
+    .filter-card {
+        padding: 0.875rem 1rem !important;
+    }
+
+    .list-filters .form-label {
+        font-size: 0.75rem;
+    }
 }
 
 @media (max-width: 575.98px) {
-    .list-filters-row {
+    .filter-card {
+        padding: 0.75rem !important;
+    }
+
+    .list-filters-head {
+        margin-bottom: 0.625rem;
+    }
+
+    .filter-form-actions {
         flex-direction: column;
-        align-items: stretch;
+    }
+
+    .filter-form-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .list-filter-actions {
+        margin-top: 0.125rem;
     }
 
     .list-filter-actions .btn {
         width: 100%;
         justify-content: center;
+    }
+
+    .list-filters .input-group-text {
+        padding-left: 0.625rem;
+        padding-right: 0.625rem;
     }
 }
 
