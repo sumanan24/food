@@ -22,9 +22,29 @@
             </div>
         </div>
     <?php else: ?>
-        <div class="report-mobile-list d-lg-none">
+        <div data-filter-scope="users">
+        <?php
+        $filterScope = 'users';
+        $searchPlaceholder = 'Search by name, email...';
+        $filterSelects = [
+            [
+                'name' => 'role',
+                'label' => 'Role',
+                'attr' => 'data-filter-role',
+                'options' => ['' => 'All roles', 'admin' => 'Admin', 'staff' => 'Staff'],
+            ],
+            [
+                'name' => 'status',
+                'label' => 'Status',
+                'attr' => 'data-filter-status',
+                'options' => ['' => 'All status', 'active' => 'Active', 'inactive' => 'Inactive'],
+            ],
+        ];
+        require VIEW_PATH . '/partials/list-filters.php';
+        ?>
+        <div class="report-mobile-list d-lg-none" data-filter-mobile>
             <?php foreach ($users as $i => $user): ?>
-                <div class="report-item-card transaction-card">
+                <div class="report-item-card transaction-card" data-filter-item data-filter-role="<?= e($user['role']) ?>" data-filter-status="<?= $user['is_active'] ? 'active' : 'inactive' ?>">
                     <div class="report-item-top">
                         <div class="transaction-item-main">
                             <span class="transaction-item-no">#<?= $i + 1 ?></span>
@@ -56,7 +76,7 @@
 
         <div class="table-card d-none d-lg-block">
             <div class="table-responsive-wrap">
-                <table class="table table-striped data-table-lg mb-0">
+                <table class="table table-striped data-table-lg mb-0" data-filter-table>
                     <thead>
                         <tr>
                             <th>#</th>
@@ -69,7 +89,7 @@
                     </thead>
                     <tbody>
                         <?php foreach ($users as $i => $user): ?>
-                            <tr>
+                            <tr data-filter-item data-filter-role="<?= e($user['role']) ?>" data-filter-status="<?= $user['is_active'] ? 'active' : 'inactive' ?>">
                                 <td><?= $i + 1 ?></td>
                                 <td><strong><?= e($user['name']) ?></strong></td>
                                 <td><?= e($user['email']) ?></td>
@@ -81,6 +101,10 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+        <div class="table-card d-none" data-filter-empty>
+            <div class="empty-state py-3"><p class="mb-0">No users match your filters.</p></div>
+        </div>
         </div>
     <?php endif; ?>
 </div>

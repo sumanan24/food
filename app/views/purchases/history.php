@@ -47,9 +47,15 @@ $filterLabel = $filterDate ? e($filterDate) : 'All dates';
             </div>
         </div>
     <?php else: ?>
-        <div class="report-mobile-list d-lg-none">
+        <div data-filter-scope="purchases-history">
+        <?php
+        $filterScope = 'purchases-history';
+        $searchPlaceholder = 'Search by item, user, date...';
+        require VIEW_PATH . '/partials/list-filters.php';
+        ?>
+        <div class="report-mobile-list d-lg-none" data-filter-mobile>
             <?php foreach ($purchases as $i => $p): ?>
-                <div class="report-item-card transaction-card">
+                <div class="report-item-card transaction-card" data-filter-item data-filter-date="<?= e($p['purchase_date']) ?>">
                     <div class="report-item-top">
                         <div class="transaction-item-main">
                             <span class="transaction-item-no">#<?= $i + 1 ?></span>
@@ -81,7 +87,7 @@ $filterLabel = $filterDate ? e($filterDate) : 'All dates';
 
         <div class="table-card d-none d-lg-block">
             <div class="table-responsive-wrap">
-                <table class="table table-striped data-table-lg mb-0">
+                <table class="table table-striped data-table-lg mb-0" data-filter-table>
                     <thead>
                         <tr>
                             <th>#</th>
@@ -95,7 +101,7 @@ $filterLabel = $filterDate ? e($filterDate) : 'All dates';
                     </thead>
                     <tbody>
                         <?php foreach ($purchases as $i => $p): ?>
-                            <tr>
+                            <tr data-filter-item data-filter-date="<?= e($p['purchase_date']) ?>">
                                 <td><?= $i + 1 ?></td>
                                 <td><?= e($p['purchase_date']) ?></td>
                                 <td><strong><?= e($p['item_name']) ?></strong></td>
@@ -108,6 +114,10 @@ $filterLabel = $filterDate ? e($filterDate) : 'All dates';
                     </tbody>
                 </table>
             </div>
+        </div>
+        <div class="table-card d-none" data-filter-empty>
+            <div class="empty-state py-3"><p class="mb-0">No purchases match your filters.</p></div>
+        </div>
         </div>
     <?php endif; ?>
 </div>

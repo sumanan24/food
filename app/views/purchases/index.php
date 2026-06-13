@@ -33,9 +33,15 @@ $totalAmount = array_sum(array_map(fn($p) => (float) $p['total_cost'], $purchase
             </div>
         </div>
     <?php else: ?>
-        <div class="report-mobile-list d-lg-none">
+        <div data-filter-scope="purchases-today">
+        <?php
+        $filterScope = 'purchases-today';
+        $searchPlaceholder = 'Search by item, user, notes...';
+        require VIEW_PATH . '/partials/list-filters.php';
+        ?>
+        <div class="report-mobile-list d-lg-none" data-filter-mobile>
             <?php foreach ($purchases as $i => $p): ?>
-                <div class="report-item-card transaction-card">
+                <div class="report-item-card transaction-card" data-filter-item>
                     <div class="report-item-top">
                         <div class="transaction-item-main">
                             <span class="transaction-item-no">#<?= $i + 1 ?></span>
@@ -66,7 +72,7 @@ $totalAmount = array_sum(array_map(fn($p) => (float) $p['total_cost'], $purchase
 
         <div class="table-card d-none d-lg-block">
             <div class="table-responsive-wrap">
-                <table class="table table-striped data-table-lg mb-0">
+                <table class="table table-striped data-table-lg mb-0" data-filter-table>
                     <thead>
                         <tr>
                             <th>#</th>
@@ -80,7 +86,7 @@ $totalAmount = array_sum(array_map(fn($p) => (float) $p['total_cost'], $purchase
                     </thead>
                     <tbody>
                         <?php foreach ($purchases as $i => $p): ?>
-                            <tr>
+                            <tr data-filter-item>
                                 <td><?= $i + 1 ?></td>
                                 <td><strong><?= e($p['item_name']) ?></strong></td>
                                 <td><?= money($p['quantity']) ?></td>
@@ -93,6 +99,10 @@ $totalAmount = array_sum(array_map(fn($p) => (float) $p['total_cost'], $purchase
                     </tbody>
                 </table>
             </div>
+        </div>
+        <div class="table-card d-none" data-filter-empty>
+            <div class="empty-state py-3"><p class="mb-0">No purchases match your filters.</p></div>
+        </div>
         </div>
     <?php endif; ?>
 </div>

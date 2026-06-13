@@ -31,14 +31,26 @@ $itemCount = count($items);
             </div>
         </div>
     <?php else: ?>
+        <div data-filter-scope="items">
+        <?php
+        $filterScope = 'items';
+        $searchPlaceholder = 'Search items by name, price, stock...';
+        $filterSelects = [[
+            'name' => 'stock',
+            'label' => 'Stock',
+            'attr' => 'data-filter-stock',
+            'options' => ['' => 'All stock', 'low' => 'Low stock', 'ok' => 'In stock'],
+        ]];
+        require VIEW_PATH . '/partials/list-filters.php';
+        ?>
         <!-- Mobile cards -->
-        <div class="inventory-mobile-list d-lg-none">
+        <div class="inventory-mobile-list d-lg-none" data-filter-mobile>
             <?php foreach ($items as $i => $item): ?>
                 <?php
                 $lowStock = (float) $item['current_stock'] <= 10;
                 $profit = (float) $item['selling_price'] - (float) $item['cost_price'];
                 ?>
-                <div class="inventory-item-card">
+                <div class="inventory-item-card" data-filter-item data-filter-stock="<?= $lowStock ? 'low' : 'ok' ?>">
                     <div class="inventory-item-header">
                         <div class="inventory-item-no">#<?= $i + 1 ?></div>
                         <strong class="inventory-item-name"><?= e($item['name']) ?></strong>
@@ -82,7 +94,7 @@ $itemCount = count($items);
         <!-- Desktop table -->
         <div class="table-card d-none d-lg-block">
             <div class="table-responsive-wrap">
-                <table class="table table-striped data-table-lg mb-0">
+                <table class="table table-striped data-table-lg mb-0" data-filter-table>
                     <thead>
                         <tr>
                             <th>#</th>
@@ -95,7 +107,7 @@ $itemCount = count($items);
                     </thead>
                     <tbody>
                         <?php foreach ($items as $i => $item): ?>
-                            <tr>
+                            <tr data-filter-item data-filter-stock="<?= (float) $item['current_stock'] <= 10 ? 'low' : 'ok' ?>">
                                 <td><?= $i + 1 ?></td>
                                 <td><strong><?= e($item['name']) ?></strong></td>
                                 <td><?= money($item['cost_price']) ?></td>
@@ -123,6 +135,10 @@ $itemCount = count($items);
                     </tbody>
                 </table>
             </div>
+        </div>
+        <div class="table-card d-none" data-filter-empty>
+            <div class="empty-state py-3"><p class="mb-0">No items match your filters.</p></div>
+        </div>
         </div>
     <?php endif; ?>
 </div>

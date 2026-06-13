@@ -1488,6 +1488,49 @@ h1, h2, h3, h4, h5, h6, .font-display {
     gap: 0.5rem;
 }
 
+.list-filters-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.75rem;
+}
+
+.list-filter-search {
+    flex: 1 1 220px;
+    min-width: 0;
+}
+
+.list-filter-field {
+    flex: 1 1 160px;
+    min-width: 0;
+}
+
+.list-filter-actions {
+    flex: 0 0 auto;
+}
+
+.list-filter-actions .btn {
+    white-space: nowrap;
+}
+
+.list-filters .input-group-text {
+    background: var(--surface-2);
+    border-color: var(--border);
+    color: var(--text-muted);
+}
+
+@media (max-width: 575.98px) {
+    .list-filters-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .list-filter-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 @media (max-width: 991.98px) {
     .list-toolbar-actions {
         width: 100%;

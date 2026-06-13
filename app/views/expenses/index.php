@@ -4,6 +4,10 @@ $config = require CONFIG_PATH . '/app.php';
 $symbol = $config['currency_symbol'] ?? 'Rs.';
 $count = count($expenses);
 $totalAmount = array_sum(array_map(fn($e) => (float) $e['amount'], $expenses));
+$expenseCategoryOptions = ['' => 'All categories'];
+foreach (array_unique(array_column($expenses, 'category_name')) as $catName) {
+    $expenseCategoryOptions[$catName] = $catName;
+}
 ?>
 
 <div class="transaction-page expenses-page">
@@ -31,9 +35,22 @@ $totalAmount = array_sum(array_map(fn($e) => (float) $e['amount'], $expenses));
             </div>
         </div>
     <?php else: ?>
-        <div class="report-mobile-list d-lg-none">
+        <div data-filter-scope="expenses">
+        <?php
+        $filterScope = 'expenses';
+        $searchPlaceholder = 'Search by title, category, user...';
+        $filterDateRange = true;
+        $filterSelects = [[
+            'name' => 'category',
+            'label' => 'Category',
+            'attr' => 'data-filter-category',
+            'options' => $expenseCategoryOptions,
+        ]];
+        require VIEW_PATH . '/partials/list-filters.php';
+        ?>
+        <div class="report-mobile-list d-lg-none" data-filter-mobile>
             <?php foreach ($expenses as $i => $exp): ?>
-                <div class="report-item-card transaction-card">
+                <div class="report-item-card transaction-card" data-filter-item data-filter-date="<?= e($exp['expense_date']) ?>" data-filter-category="<?= e($exp['category_name']) ?>">
                     <div class="report-item-top">
                         <div class="transaction-item-main">
                             <span class="transaction-item-no">#<?= $i + 1 ?></span>
@@ -77,7 +94,7 @@ $totalAmount = array_sum(array_map(fn($e) => (float) $e['amount'], $expenses));
 
         <div class="table-card d-none d-lg-block">
             <div class="table-responsive-wrap">
-                <table class="table table-striped data-table-lg mb-0">
+                <table class="table table-striped data-table-lg mb-0" data-filter-table>
                     <thead>
                         <tr>
                             <th>#</th>
@@ -91,7 +108,7 @@ $totalAmount = array_sum(array_map(fn($e) => (float) $e['amount'], $expenses));
                     </thead>
                     <tbody>
                         <?php foreach ($expenses as $i => $exp): ?>
-                            <tr>
+                            <tr data-filter-item data-filter-date="<?= e($exp['expense_date']) ?>" data-filter-category="<?= e($exp['category_name']) ?>">
                                 <td><?= $i + 1 ?></td>
                                 <td><?= e($exp['expense_date']) ?></td>
                                 <td><strong><?= e($exp['title']) ?></strong></td>
@@ -116,6 +133,10 @@ $totalAmount = array_sum(array_map(fn($e) => (float) $e['amount'], $expenses));
                     </tbody>
                 </table>
             </div>
+        </div>
+        <div class="table-card d-none" data-filter-empty>
+            <div class="empty-state py-3"><p class="mb-0">No expenses match your filters.</p></div>
+        </div>
         </div>
     <?php endif; ?>
 </div>

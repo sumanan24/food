@@ -78,9 +78,15 @@ $periodLabel = $report['start'] === $report['end']
         <?php if (empty($report['sales'])): ?>
             <div class="empty-state py-3"><p class="mb-0">No sales in this period.</p></div>
         <?php else: ?>
-            <div class="report-mobile-list d-lg-none">
+            <div data-filter-scope="report-sales">
+            <?php
+            $filterScope = 'report-sales';
+            $searchPlaceholder = 'Search sales...';
+            require VIEW_PATH . '/partials/list-filters.php';
+            ?>
+            <div class="report-mobile-list d-lg-none" data-filter-mobile>
                 <?php foreach ($report['sales'] as $s): ?>
-                    <div class="report-item-card">
+                    <div class="report-item-card" data-filter-item data-filter-date="<?= e($s['sale_date']) ?>">
                         <div class="report-item-top">
                             <strong class="report-item-title"><?= e($s['item_name']) ?></strong>
                             <span class="report-item-amount text-profit"><?= $symbol ?> <?= money($s['total_price']) ?></span>
@@ -94,13 +100,13 @@ $periodLabel = $report['start'] === $report['end']
                 <?php endforeach; ?>
             </div>
             <div class="table-responsive-wrap d-none d-lg-block">
-                <table class="table table-striped data-table-lg mb-0">
+                <table class="table table-striped data-table-lg mb-0" data-filter-table>
                     <thead>
                         <tr><th>Date</th><th>Item</th><th>Qty</th><th>Total</th><th>By</th></tr>
                     </thead>
                     <tbody>
                         <?php foreach ($report['sales'] as $s): ?>
-                            <tr>
+                            <tr data-filter-item data-filter-date="<?= e($s['sale_date']) ?>">
                                 <td><?= e($s['sale_date']) ?></td>
                                 <td><?= e($s['item_name']) ?></td>
                                 <td><?= money($s['quantity']) ?></td>
@@ -110,6 +116,10 @@ $periodLabel = $report['start'] === $report['end']
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+            </div>
+            <div class="table-card d-none border-0 shadow-none px-0" data-filter-empty>
+                <div class="empty-state py-3"><p class="mb-0">No sales match your filters.</p></div>
+            </div>
             </div>
         <?php endif; ?>
     </div>
@@ -121,9 +131,15 @@ $periodLabel = $report['start'] === $report['end']
         <?php if (empty($report['purchases'])): ?>
             <div class="empty-state py-3"><p class="mb-0">No purchases in this period.</p></div>
         <?php else: ?>
-            <div class="report-mobile-list d-lg-none">
+            <div data-filter-scope="report-purchases">
+            <?php
+            $filterScope = 'report-purchases';
+            $searchPlaceholder = 'Search purchases...';
+            require VIEW_PATH . '/partials/list-filters.php';
+            ?>
+            <div class="report-mobile-list d-lg-none" data-filter-mobile>
                 <?php foreach ($report['purchases'] as $p): ?>
-                    <div class="report-item-card">
+                    <div class="report-item-card" data-filter-item data-filter-date="<?= e($p['purchase_date']) ?>">
                         <div class="report-item-top">
                             <strong class="report-item-title"><?= e($p['item_name']) ?></strong>
                             <span class="report-item-amount"><?= $symbol ?> <?= money($p['total_cost']) ?></span>
@@ -137,13 +153,13 @@ $periodLabel = $report['start'] === $report['end']
                 <?php endforeach; ?>
             </div>
             <div class="table-responsive-wrap d-none d-lg-block">
-                <table class="table table-striped data-table-lg mb-0">
+                <table class="table table-striped data-table-lg mb-0" data-filter-table>
                     <thead>
                         <tr><th>Date</th><th>Item</th><th>Qty</th><th>Total</th><th>By</th></tr>
                     </thead>
                     <tbody>
                         <?php foreach ($report['purchases'] as $p): ?>
-                            <tr>
+                            <tr data-filter-item data-filter-date="<?= e($p['purchase_date']) ?>">
                                 <td><?= e($p['purchase_date']) ?></td>
                                 <td><?= e($p['item_name']) ?></td>
                                 <td><?= money($p['quantity']) ?></td>
@@ -153,6 +169,10 @@ $periodLabel = $report['start'] === $report['end']
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+            </div>
+            <div class="table-card d-none border-0 shadow-none px-0" data-filter-empty>
+                <div class="empty-state py-3"><p class="mb-0">No purchases match your filters.</p></div>
+            </div>
             </div>
         <?php endif; ?>
     </div>
@@ -164,9 +184,25 @@ $periodLabel = $report['start'] === $report['end']
         <?php if (empty($report['expenses'])): ?>
             <div class="empty-state py-3"><p class="mb-0">No expenses in this period.</p></div>
         <?php else: ?>
-            <div class="report-mobile-list d-lg-none">
+            <div data-filter-scope="report-expenses">
+            <?php
+            $filterScope = 'report-expenses';
+            $searchPlaceholder = 'Search expenses...';
+            $reportExpenseCategories = ['' => 'All categories'];
+            foreach (array_unique(array_column($report['expenses'], 'category_name')) as $catName) {
+                $reportExpenseCategories[$catName] = $catName;
+            }
+            $filterSelects = [[
+                'name' => 'category',
+                'label' => 'Category',
+                'attr' => 'data-filter-category',
+                'options' => $reportExpenseCategories,
+            ]];
+            require VIEW_PATH . '/partials/list-filters.php';
+            ?>
+            <div class="report-mobile-list d-lg-none" data-filter-mobile>
                 <?php foreach ($report['expenses'] as $exp): ?>
-                    <div class="report-item-card">
+                    <div class="report-item-card" data-filter-item data-filter-date="<?= e($exp['expense_date']) ?>" data-filter-category="<?= e($exp['category_name']) ?>">
                         <div class="report-item-top">
                             <strong class="report-item-title"><?= e($exp['title']) ?></strong>
                             <span class="report-item-amount text-loss"><?= $symbol ?> <?= money($exp['amount']) ?></span>
@@ -180,13 +216,13 @@ $periodLabel = $report['start'] === $report['end']
                 <?php endforeach; ?>
             </div>
             <div class="table-responsive-wrap d-none d-lg-block">
-                <table class="table table-striped data-table-lg mb-0">
+                <table class="table table-striped data-table-lg mb-0" data-filter-table>
                     <thead>
                         <tr><th>Date</th><th>Title</th><th>Category</th><th>Amount</th><th>By</th></tr>
                     </thead>
                     <tbody>
                         <?php foreach ($report['expenses'] as $exp): ?>
-                            <tr>
+                            <tr data-filter-item data-filter-date="<?= e($exp['expense_date']) ?>" data-filter-category="<?= e($exp['category_name']) ?>">
                                 <td><?= e($exp['expense_date']) ?></td>
                                 <td><?= e($exp['title']) ?></td>
                                 <td><?= e($exp['category_name']) ?></td>
@@ -196,6 +232,10 @@ $periodLabel = $report['start'] === $report['end']
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+            </div>
+            <div class="table-card d-none border-0 shadow-none px-0" data-filter-empty>
+                <div class="empty-state py-3"><p class="mb-0">No expenses match your filters.</p></div>
+            </div>
             </div>
         <?php endif; ?>
     </div>
