@@ -70,6 +70,7 @@ CREATE TABLE IF NOT EXISTS `bills` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `bill_number` VARCHAR(30) NOT NULL,
     `user_id` INT UNSIGNED NOT NULL,
+    `cash_session_id` INT UNSIGNED NULL,
     `subtotal` DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
     `discount` DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
     `total_amount` DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
@@ -80,6 +81,7 @@ CREATE TABLE IF NOT EXISTS `bills` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_bills_number` (`bill_number`),
     KEY `idx_bills_date` (`bill_date`),
+    KEY `idx_bills_cash_session` (`cash_session_id`),
     CONSTRAINT `fk_bills_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -164,9 +166,12 @@ CREATE TABLE IF NOT EXISTS `cash_sessions` (
     `closed_at` TIMESTAMP NULL,
     `notes` TEXT NULL,
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_cash_session_date` (`session_date`),
+    KEY `idx_cash_sessions_date_status` (`session_date`, `status`),
     CONSTRAINT `fk_cash_sessions_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `bills`
+    ADD CONSTRAINT `fk_bills_cash_session` FOREIGN KEY (`cash_session_id`) REFERENCES `cash_sessions` (`id`) ON DELETE SET NULL;
 
 CREATE TABLE IF NOT EXISTS `expense_categories` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,

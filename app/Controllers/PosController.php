@@ -27,7 +27,7 @@ class PosController extends Controller
 
     public function index(): void
     {
-        $session = $this->cashModel->getToday();
+        $session = $this->cashModel->getOpenSession();
         $counterOpen = $this->cashModel->isCounterOpen();
 
         $this->view('pos/index', [
@@ -46,6 +46,8 @@ class PosController extends Controller
             Session::flash('error', 'Bill counter is not open. Open the counter with hand cash before billing.');
             $this->redirect('/cash');
         }
+
+        $openSession = $this->cashModel->getOpenSession();
 
         $itemsJson = (string) $this->input('items', '[]');
         $items = json_decode($itemsJson, true);
@@ -98,6 +100,7 @@ class PosController extends Controller
             $billId = $this->billModel->createWithItems([
                 'bill_number' => $billNumber,
                 'user_id' => Auth::id(),
+                'cash_session_id' => $openSession ? (int) $openSession['id'] : null,
                 'subtotal' => $subtotal,
                 'discount' => $discount,
                 'total_amount' => $total,
@@ -126,7 +129,9 @@ class PosController extends Controller
             'title' => 'Receipt ' . $bill['bill_number'],
             'bill' => $bill,
             'items' => $this->billModel->getItems($id),
-            'session' => $this->cashModel->findByDate($bill['bill_date']),
+            'session' => !empty($bill['cash_session_id'])
+                ? $this->cashModel->find((int) $bill['cash_session_id'])
+                : $this->cashModel->findByDate($bill['bill_date']),
         ]);
     }
 

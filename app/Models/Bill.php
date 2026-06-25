@@ -24,12 +24,13 @@ class Bill extends Model
         $this->db->beginTransaction();
         try {
             $stmt = $this->db->prepare(
-                'INSERT INTO bills (bill_number, user_id, subtotal, discount, total_amount, payment_method, bill_date, notes)
-                 VALUES (:bill_number, :user_id, :subtotal, :discount, :total_amount, :payment_method, :bill_date, :notes)'
+                'INSERT INTO bills (bill_number, user_id, cash_session_id, subtotal, discount, total_amount, payment_method, bill_date, notes)
+                 VALUES (:bill_number, :user_id, :cash_session_id, :subtotal, :discount, :total_amount, :payment_method, :bill_date, :notes)'
             );
             $stmt->execute([
                 'bill_number' => $billData['bill_number'],
                 'user_id' => $billData['user_id'],
+                'cash_session_id' => $billData['cash_session_id'] ?? null,
                 'subtotal' => $billData['subtotal'],
                 'discount' => $billData['discount'],
                 'total_amount' => $billData['total_amount'],
@@ -98,6 +99,15 @@ class Bill extends Model
             'SELECT COALESCE(SUM(total_amount), 0) FROM bills WHERE bill_date = CURDATE()'
         );
         $stmt->execute();
+        return (float) $stmt->fetchColumn();
+    }
+
+    public function totalForSession(int $sessionId): float
+    {
+        $stmt = $this->db->prepare(
+            'SELECT COALESCE(SUM(total_amount), 0) FROM bills WHERE cash_session_id = :session_id'
+        );
+        $stmt->execute(['session_id' => $sessionId]);
         return (float) $stmt->fetchColumn();
     }
 

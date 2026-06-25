@@ -27,10 +27,14 @@ class Dashboard extends Model
         $monthlyExpenses = $expenseModel->totalBetween($monthStart, $monthEnd);
         $monthlyProfit = $monthlySales - $monthlyPurchases - $monthlyExpenses;
 
-        $cashSession = $cashModel->getToday();
-        $cashInHand = $cashSession
-            ? (float) $cashSession['opening_balance'] + $todaySales - $todayExpenses
-            : 0;
+        $cashSession = $cashModel->getOpenSession();
+        if ($cashSession) {
+            $sessionSales = $billModel->totalForSession((int) $cashSession['id']);
+            $sessionExpenses = $expenseModel->totalDuringSession($cashSession['opened_at']);
+            $cashInHand = (float) $cashSession['opening_balance'] + $sessionSales - $sessionExpenses;
+        } else {
+            $cashInHand = 0;
+        }
 
         $itemModel = new Item();
         $lowStock = $itemModel->lowStockItems();

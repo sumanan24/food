@@ -23,21 +23,31 @@ class CashController extends Controller
 
     public function index(): void
     {
-        $today = $this->cashModel->getToday();
+        $openSession = $this->cashModel->getOpenSession();
+        $todaySessions = $this->cashModel->getTodaySessions();
         $billModel = new Bill();
         $expenseModel = new Expense();
 
         $todaySales = $billModel->todayTotal();
         $todayExpenses = $expenseModel->todayTotal();
-        $expectedCash = $today
-            ? (float) $today['opening_balance'] + $todaySales - $todayExpenses
-            : 0;
+
+        $sessionSales = 0.0;
+        $sessionExpenses = 0.0;
+        $expectedCash = 0.0;
+        if ($openSession) {
+            $sessionSales = $billModel->totalForSession((int) $openSession['id']);
+            $sessionExpenses = $expenseModel->totalDuringSession($openSession['opened_at']);
+            $expectedCash = (float) $openSession['opening_balance'] + $sessionSales - $sessionExpenses;
+        }
 
         $this->view('cash/index', [
             'title' => 'Bill Counter',
-            'session' => $today,
+            'session' => $openSession,
+            'todaySessions' => $todaySessions,
             'todaySales' => $todaySales,
             'todayExpenses' => $todayExpenses,
+            'sessionSales' => $sessionSales,
+            'sessionExpenses' => $sessionExpenses,
             'expectedCash' => $expectedCash,
             'history' => $this->cashModel->history(15),
             'defaultPersonName' => Auth::user()['name'] ?? '',
@@ -71,10 +81,10 @@ class CashController extends Controller
     public function close(): void
     {
         $this->validateCsrf();
-        $session = $this->cashModel->getToday();
+        $session = $this->cashModel->getOpenSession();
 
-        if (!$session || $session['status'] === 'closed') {
-            Session::flash('error', 'No open cash session for today.');
+        if (!$session) {
+            Session::flash('error', 'No open cash session. Open the counter first.');
             $this->redirect('/cash');
         }
 
@@ -91,7 +101,7 @@ class CashController extends Controller
         }
 
         if ($this->cashModel->close((int) $session['id'], $cashReceived, $closedByName, $notes ?: null)) {
-            Session::flash('success', 'Cash closed. Counted: ' . money($cashReceived) . '.');
+            Session::flash('success', 'Cash closed. Counted: ' . money($cashReceived) . '. You can open again when ready.');
         } else {
             Session::flash('error', 'Failed to close cash session.');
         }

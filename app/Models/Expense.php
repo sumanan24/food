@@ -75,6 +75,19 @@ class Expense extends Model
         return (float) $stmt->fetchColumn();
     }
 
+    public function totalDuringSession(string $openedAt, ?string $closedAt = null): float
+    {
+        $stmt = $this->db->prepare(
+            'SELECT COALESCE(SUM(amount), 0) FROM expenses
+             WHERE created_at >= :opened_at AND created_at <= :closed_at'
+        );
+        $stmt->execute([
+            'opened_at' => $openedAt,
+            'closed_at' => $closedAt ?? date('Y-m-d H:i:s'),
+        ]);
+        return (float) $stmt->fetchColumn();
+    }
+
     public function totalBetween(string $start, string $end): float
     {
         $stmt = $this->db->prepare(

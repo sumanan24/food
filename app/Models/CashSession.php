@@ -11,20 +11,39 @@ class CashSession extends Model
 {
     public function isCounterOpen(): bool
     {
-        $session = $this->getToday();
-        return $session !== null && $session['status'] === 'open';
+        return $this->getOpenSession() !== null;
     }
 
-    public function getToday(): ?array
+    /** Current open counter session (only one can be open at a time). */
+    public function getOpenSession(): ?array
     {
         $stmt = $this->db->prepare(
             'SELECT cs.*, u.name AS user_name FROM cash_sessions cs
              JOIN users u ON u.id = cs.user_id
-             WHERE cs.session_date = CURDATE() LIMIT 1'
+             WHERE cs.status = \'open\'
+             ORDER BY cs.opened_at DESC LIMIT 1'
         );
         $stmt->execute();
         $row = $stmt->fetch();
         return $row ?: null;
+    }
+
+    /** @deprecated Use getOpenSession() */
+    public function getToday(): ?array
+    {
+        return $this->getOpenSession();
+    }
+
+    public function getTodaySessions(): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT cs.*, u.name AS user_name FROM cash_sessions cs
+             JOIN users u ON u.id = cs.user_id
+             WHERE cs.session_date = CURDATE()
+             ORDER BY cs.opened_at ASC'
+        );
+        $stmt->execute();
+        return $stmt->fetchAll();
     }
 
     public function findByDate(string $date): ?array
@@ -32,7 +51,8 @@ class CashSession extends Model
         $stmt = $this->db->prepare(
             'SELECT cs.*, u.name AS user_name FROM cash_sessions cs
              JOIN users u ON u.id = cs.user_id
-             WHERE cs.session_date = :date LIMIT 1'
+             WHERE cs.session_date = :date
+             ORDER BY cs.opened_at DESC LIMIT 1'
         );
         $stmt->execute(['date' => $date]);
         $row = $stmt->fetch();
@@ -41,12 +61,11 @@ class CashSession extends Model
 
     public function open(int $userId, float $openingBalance, string $counterPersonName, ?string $date = null): int
     {
-        $sessionDate = $date ?? date('Y-m-d');
-        $existing = $this->findByDate($sessionDate);
-        if ($existing) {
-            throw new \RuntimeException('Bill counter already opened for today.');
+        if ($this->getOpenSession() !== null) {
+            throw new \RuntimeException('Bill counter is already open. Close it before opening again.');
         }
 
+        $sessionDate = $date ?? date('Y-m-d');
         $counterPersonName = trim($counterPersonName);
         if ($counterPersonName === '') {
             throw new \RuntimeException('Counter person name is required.');
@@ -79,8 +98,9 @@ class CashSession extends Model
 
         $billModel = new Bill();
         $expenseModel = new Expense();
-        $totalSales = $billModel->totalBetween($session['session_date'], $session['session_date']);
-        $totalExpenses = $expenseModel->totalBetween($session['session_date'], $session['session_date']);
+        $closedAt = date('Y-m-d H:i:s');
+        $totalSales = $billModel->totalForSession($id);
+        $totalExpenses = $expenseModel->totalDuringSession($session['opened_at'], $closedAt);
         $expectedCash = (float) $session['opening_balance'] + $totalSales - $totalExpenses;
         $closingBalance = $cashReceived;
         $cashDifference = $cashReceived - $expectedCash;
@@ -89,7 +109,7 @@ class CashSession extends Model
             'UPDATE cash_sessions SET total_sales = :total_sales, total_expenses = :total_expenses,
              cash_received = :cash_received, closing_balance = :closing_balance,
              cash_difference = :cash_difference, closed_by_name = :closed_by_name,
-             status = \'closed\', closed_at = NOW(), notes = :notes
+             status = \'closed\', closed_at = :closed_at, notes = :notes
              WHERE id = :id'
         );
         return $stmt->execute([
@@ -100,6 +120,7 @@ class CashSession extends Model
             'closing_balance' => $closingBalance,
             'cash_difference' => $cashDifference,
             'closed_by_name' => $closedByName,
+            'closed_at' => $closedAt,
             'notes' => $notes,
         ]);
     }
@@ -117,7 +138,7 @@ class CashSession extends Model
         $stmt = $this->db->prepare(
             'SELECT cs.*, u.name AS user_name FROM cash_sessions cs
              JOIN users u ON u.id = cs.user_id
-             ORDER BY cs.session_date DESC LIMIT :lim'
+             ORDER BY cs.opened_at DESC LIMIT :lim'
         );
         $stmt->bindValue('lim', $limit, \PDO::PARAM_INT);
         $stmt->execute();

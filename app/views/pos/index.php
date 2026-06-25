@@ -28,15 +28,9 @@ $itemsJson = json_encode(array_map(fn($i) => [
         <div class="alert alert-warning d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 mb-3">
             <div>
                 <strong><i class="bi bi-exclamation-triangle me-1"></i> Bill counter is not open.</strong>
-                <?php if ($session && $session['status'] === 'closed'): ?>
-                    <span class="d-block small">Today's counter was closed<?= !empty($session['closed_by_name']) ? ' by ' . e($session['closed_by_name']) : '' ?>. Open again tomorrow morning.</span>
-                <?php else: ?>
-                    <span class="d-block small">Open the counter with hand cash and counter person name before preparing bills.</span>
-                <?php endif; ?>
+                <span class="d-block small">Open the counter with hand cash before preparing bills. You can open and close multiple times per day.</span>
             </div>
-            <?php if (!$session || $session['status'] !== 'closed'): ?>
-                <a href="<?= url('cash') ?>" class="btn btn-warning btn-sm flex-shrink-0">Open Bill Counter</a>
-            <?php endif; ?>
+            <a href="<?= url('cash') ?>" class="btn btn-warning btn-sm flex-shrink-0">Open Bill Counter</a>
         </div>
     <?php else: ?>
         <div class="alert alert-success py-2 mb-3">
