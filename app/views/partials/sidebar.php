@@ -3,9 +3,13 @@ use App\Core\Auth;
 
 $navItems = [
     ['path' => '', 'label' => 'Dashboard', 'icon' => 'speedometer2', 'match' => fn($p) => $p === ''],
+    ['path' => 'pos', 'label' => 'POS Billing', 'icon' => 'receipt-cutoff', 'match' => fn($p) => str_starts_with($p, 'pos'), 'section' => 'Shop'],
+    ['path' => 'cash', 'label' => 'Bill Counter', 'icon' => 'cash-stack', 'match' => fn($p) => str_starts_with($p, 'cash')],
+    ['path' => 'daily-balance', 'label' => 'Daily Balance', 'icon' => 'egg-fried', 'match' => fn($p) => str_starts_with($p, 'daily-balance')],
+    ['path' => 'wastage', 'label' => 'Wastage', 'icon' => 'trash', 'match' => fn($p) => str_starts_with($p, 'wastage')],
     ['path' => 'items', 'label' => 'Items', 'icon' => 'box-seam', 'match' => fn($p) => str_starts_with($p, 'items'), 'section' => 'Inventory'],
+    ['path' => 'inventory', 'label' => 'Long Stock', 'icon' => 'boxes', 'match' => fn($p) => str_starts_with($p, 'inventory')],
     ['path' => 'purchases', 'label' => 'Purchases', 'icon' => 'cart-plus', 'match' => fn($p) => str_starts_with($p, 'purchases'), 'section' => 'Transactions'],
-    ['path' => 'sales', 'label' => 'Sales', 'icon' => 'cash-coin', 'match' => fn($p) => str_starts_with($p, 'sales')],
     ['path' => 'expenses', 'label' => 'Expenses', 'icon' => 'wallet2', 'match' => fn($p) => str_starts_with($p, 'expenses') && !str_starts_with($p, 'expense-categories')],
 ];
 
@@ -23,7 +27,7 @@ $lastSection = null;
         <div class="brand-icon"><i class="bi bi-shop"></i></div>
         <div class="brand-text">
             <span class="brand-name"><?= e($config['name']) ?></span>
-            <span class="brand-tagline">Inventory Hub</span>
+            <span class="brand-tagline">Food Shop POS</span>
         </div>
         <button type="button" class="sidebar-close d-lg-none" id="sidebarClose" aria-label="Close menu">
             <i class="bi bi-x-lg"></i>
@@ -55,7 +59,7 @@ $lastSection = null;
             <div class="user-avatar"><?= strtoupper(substr($user['name'] ?? 'U', 0, 1)) ?></div>
             <div class="user-info">
                 <strong><?= e($user['name'] ?? '') ?></strong>
-                <span class="role-badge role-<?= e($user['role'] ?? 'staff') ?>"><?= e(ucfirst($user['role'] ?? '')) ?></span>
+                <span class="role-badge role-<?= e($user['role'] ?? 'cashier') ?>"><?= e(ucfirst($user['role'] ?? '')) ?></span>
             </div>
         </div>
         <div class="sidebar-actions">

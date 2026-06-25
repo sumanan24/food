@@ -10,24 +10,39 @@ class Dashboard extends Model
 {
     public function getSummary(): array
     {
-        $saleModel = new Sale();
+        $billModel = new Bill();
         $purchaseModel = new Purchase();
         $expenseModel = new Expense();
+        $cashModel = new CashSession();
 
-        $todaySales = $saleModel->todayTotal();
+        $todaySales = $billModel->todayTotal();
         $todayPurchases = $purchaseModel->todayTotal();
         $todayExpenses = $expenseModel->todayTotal();
         $profit = $todaySales - $todayPurchases - $todayExpenses;
 
-        $lowStock = $this->db->query(
-            'SELECT * FROM items WHERE is_active = 1 AND current_stock <= 10 ORDER BY current_stock ASC LIMIT 5'
-        )->fetchAll();
+        $monthStart = date('Y-m-01');
+        $monthEnd = date('Y-m-d');
+        $monthlySales = $billModel->totalBetween($monthStart, $monthEnd);
+        $monthlyPurchases = $purchaseModel->totalBetween($monthStart, $monthEnd);
+        $monthlyExpenses = $expenseModel->totalBetween($monthStart, $monthEnd);
+        $monthlyProfit = $monthlySales - $monthlyPurchases - $monthlyExpenses;
+
+        $cashSession = $cashModel->getToday();
+        $cashInHand = $cashSession
+            ? (float) $cashSession['opening_balance'] + $todaySales - $todayExpenses
+            : 0;
+
+        $itemModel = new Item();
+        $lowStock = $itemModel->lowStockItems();
 
         return [
             'today_sales' => $todaySales,
             'today_purchases' => $todayPurchases,
             'today_expenses' => $todayExpenses,
             'today_profit' => $profit,
+            'monthly_profit' => $monthlyProfit,
+            'cash_in_hand' => $cashInHand,
+            'cash_session' => $cashSession,
             'low_stock_items' => $lowStock,
         ];
     }
@@ -37,11 +52,11 @@ class Dashboard extends Model
         $end = date('Y-m-d');
         $start = date('Y-m-d', strtotime("-{$days} days"));
 
-        $saleModel = new Sale();
+        $billModel = new Bill();
         $purchaseModel = new Purchase();
         $expenseModel = new Expense();
 
-        $sales = $this->indexByDate($saleModel->chartData($start, $end));
+        $sales = $this->indexByDate($this->billChartData($start, $end));
         $purchases = $this->indexByDate($purchaseModel->chartData($start, $end));
         $expenses = $this->indexByDate($expenseModel->chartData($start, $end));
 
@@ -49,6 +64,7 @@ class Dashboard extends Model
         $salesData = [];
         $purchasesData = [];
         $expensesData = [];
+        $profitData = [];
 
         $current = strtotime($start);
         $endTs = strtotime($end);
@@ -56,9 +72,13 @@ class Dashboard extends Model
         while ($current <= $endTs) {
             $date = date('Y-m-d', $current);
             $labels[] = date('M d', $current);
-            $salesData[] = (float) ($sales[$date] ?? 0);
-            $purchasesData[] = (float) ($purchases[$date] ?? 0);
-            $expensesData[] = (float) ($expenses[$date] ?? 0);
+            $s = (float) ($sales[$date] ?? 0);
+            $p = (float) ($purchases[$date] ?? 0);
+            $e = (float) ($expenses[$date] ?? 0);
+            $salesData[] = $s;
+            $purchasesData[] = $p;
+            $expensesData[] = $e;
+            $profitData[] = $s - $p - $e;
             $current = strtotime('+1 day', $current);
         }
 
@@ -67,7 +87,19 @@ class Dashboard extends Model
             'sales' => $salesData,
             'purchases' => $purchasesData,
             'expenses' => $expensesData,
+            'profit' => $profitData,
         ];
+    }
+
+    private function billChartData(string $start, string $end): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT bill_date AS label, SUM(total_amount) AS total
+             FROM bills WHERE bill_date BETWEEN :start AND :end
+             GROUP BY bill_date ORDER BY bill_date ASC'
+        );
+        $stmt->execute(['start' => $start, 'end' => $end]);
+        return $stmt->fetchAll();
     }
 
     private function indexByDate(array $rows): array

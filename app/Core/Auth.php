@@ -50,8 +50,14 @@ class Auth
         return Session::get('user_role') === 'admin';
     }
 
+    public static function isCashier(): bool
+    {
+        $role = Session::get('user_role');
+        return $role === 'cashier' || $role === 'staff';
+    }
+
     public static function isStaff(): bool
     {
-        return Session::get('user_role') === 'staff';
+        return self::isCashier();
     }
 }

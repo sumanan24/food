@@ -9,9 +9,9 @@ $symbol = $config['currency_symbol'] ?? 'Rs.';
         <h2>Hello, <?= e(explode(' ', Auth::user()['name'] ?? 'User')[0]) ?> 👋</h2>
         <p>Here's what's happening with your shop today.</p>
         <div class="quick-actions">
-            <a href="<?= url('sales/create') ?>" class="quick-action-btn"><i class="bi bi-cash-coin"></i> New Sale</a>
-            <a href="<?= url('purchases/create') ?>" class="quick-action-btn"><i class="bi bi-cart-plus"></i> New Purchase</a>
-            <a href="<?= url('expenses/create') ?>" class="quick-action-btn"><i class="bi bi-wallet2"></i> Add Expense</a>
+            <a href="<?= url('pos') ?>" class="quick-action-btn"><i class="bi bi-receipt-cutoff"></i> POS Billing</a>
+            <a href="<?= url('purchases/create') ?>" class="quick-action-btn"><i class="bi bi-cart-plus"></i> Purchase</a>
+            <a href="<?= url('cash') ?>" class="quick-action-btn"><i class="bi bi-cash-stack"></i> Bill Counter</a>
         </div>
     </div>
 </div>
@@ -55,12 +55,46 @@ $symbol = $config['currency_symbol'] ?? 'Rs.';
             <div class="card-body">
                 <div class="stat-icon d-none d-sm-flex"><i class="bi bi-graph-up-arrow"></i></div>
                 <div>
-                    <div class="stat-label">Profit</div>
+                    <div class="stat-label">Today Profit</div>
                     <div class="stat-value <?= $summary['today_profit'] >= 0 ? 'text-profit' : 'text-loss' ?>">
                         <?= $symbol ?> <?= money($summary['today_profit']) ?>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3">
+        <div class="card stat-card stat-sales">
+            <div class="card-body">
+                <div class="stat-icon d-none d-sm-flex"><i class="bi bi-cash-stack"></i></div>
+                <div>
+                    <div class="stat-label">Cash in Hand</div>
+                    <div class="stat-value"><?= $symbol ?> <?= money($summary['cash_in_hand']) ?></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="card stat-card stat-purchases">
+            <div class="card-body">
+                <div class="stat-icon d-none d-sm-flex"><i class="bi bi-calendar-month"></i></div>
+                <div>
+                    <div class="stat-label">Monthly Profit</div>
+                    <div class="stat-value <?= $summary['monthly_profit'] >= 0 ? 'text-profit' : 'text-loss' ?>">
+                        <?= $symbol ?> <?= money($summary['monthly_profit']) ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-xl-6">
+        <div class="quick-actions">
+            <a href="<?= url('pos') ?>" class="quick-action-btn"><i class="bi bi-receipt-cutoff"></i> POS Billing</a>
+            <a href="<?= url('cash') ?>" class="quick-action-btn"><i class="bi bi-cash-stack"></i> Bill Counter</a>
+            <a href="<?= url('daily-balance') ?>" class="quick-action-btn"><i class="bi bi-egg-fried"></i> Daily Balance</a>
         </div>
     </div>
 </div>

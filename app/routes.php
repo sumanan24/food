@@ -3,15 +3,20 @@
 declare(strict_types=1);
 
 use App\Controllers\AuthController;
+use App\Controllers\CashController;
+use App\Controllers\DailyBalanceController;
 use App\Controllers\DashboardController;
 use App\Controllers\ExpenseCategoryController;
 use App\Controllers\ExpenseController;
 use App\Controllers\InstallController;
+use App\Controllers\InventoryReportController;
 use App\Controllers\ItemController;
+use App\Controllers\PosController;
 use App\Controllers\PurchaseController;
 use App\Controllers\ReportController;
 use App\Controllers\SaleController;
 use App\Controllers\UserController;
+use App\Controllers\WastageController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\GuestMiddleware;
 use App\Middleware\RoleMiddleware;
@@ -33,6 +38,29 @@ $router->get('/logout', [AuthController::class, 'logout'], [AuthMiddleware::clas
 $router->get('/change-password', [AuthController::class, 'changePasswordForm'], [AuthMiddleware::class]);
 $router->post('/change-password', [AuthController::class, 'changePassword'], [AuthMiddleware::class]);
 
+// POS / Billing
+$router->get('/pos', [PosController::class, 'index'], [AuthMiddleware::class]);
+$router->post('/pos/store', [PosController::class, 'store'], [AuthMiddleware::class]);
+$router->get('/pos/receipt/{id}', [PosController::class, 'receipt'], [AuthMiddleware::class]);
+$router->get('/pos/history', [PosController::class, 'history'], [AuthMiddleware::class]);
+
+// Cash Open / Close
+$router->get('/cash', [CashController::class, 'index'], [AuthMiddleware::class]);
+$router->post('/cash/open', [CashController::class, 'open'], [AuthMiddleware::class]);
+$router->post('/cash/close', [CashController::class, 'close'], [AuthMiddleware::class]);
+
+// Daily Food Balance
+$router->get('/daily-balance', [DailyBalanceController::class, 'index'], [AuthMiddleware::class]);
+$router->post('/daily-balance/opening', [DailyBalanceController::class, 'saveOpening'], [AuthMiddleware::class]);
+
+// Wastage
+$router->get('/wastage', [WastageController::class, 'index'], [AuthMiddleware::class]);
+$router->post('/wastage/store', [WastageController::class, 'store'], [AuthMiddleware::class]);
+
+// Long Use Inventory
+$router->get('/inventory', [InventoryReportController::class, 'index'], [AuthMiddleware::class]);
+$router->get('/inventory/ledger/{id}', [InventoryReportController::class, 'ledger'], [AuthMiddleware::class]);
+
 // Items
 $router->get('/items', [ItemController::class, 'index'], [AuthMiddleware::class]);
 $router->get('/items/create', [ItemController::class, 'create'], [AuthMiddleware::class, RoleMiddleware::class . ':admin']);
@@ -47,7 +75,7 @@ $router->get('/purchases/create', [PurchaseController::class, 'create'], [AuthMi
 $router->post('/purchases/store', [PurchaseController::class, 'store'], [AuthMiddleware::class]);
 $router->get('/purchases/history', [PurchaseController::class, 'history'], [AuthMiddleware::class]);
 
-// Sales
+// Sales (legacy single-item)
 $router->get('/sales', [SaleController::class, 'index'], [AuthMiddleware::class]);
 $router->get('/sales/create', [SaleController::class, 'create'], [AuthMiddleware::class]);
 $router->post('/sales/store', [SaleController::class, 'store'], [AuthMiddleware::class]);

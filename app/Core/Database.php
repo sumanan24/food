@@ -43,6 +43,45 @@ class Database
         return self::$instance;
     }
 
+    public static function isSchemaReady(): bool
+    {
+        try {
+            if (!file_exists(CONFIG_PATH . '/database.local.php')) {
+                return false;
+            }
+            $pdo = self::getInstance();
+            $result = $pdo->query("SHOW TABLES LIKE 'users'");
+            return $result !== false && $result->rowCount() > 0;
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    public static function isInstalled(): bool
+    {
+        if (!self::isSchemaReady()) {
+            return false;
+        }
+        try {
+            $count = (int) self::getInstance()->query('SELECT COUNT(*) FROM users')->fetchColumn();
+            return $count > 0;
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    public static function ensureSchema(): void
+    {
+        if (self::isSchemaReady()) {
+            return;
+        }
+
+        self::runSqlFile(ROOT_PATH . '/sql/schema.sql');
+        if (file_exists(ROOT_PATH . '/sql/seed.sql')) {
+            self::runSqlFile(ROOT_PATH . '/sql/seed.sql');
+        }
+    }
+
     public static function reset(): void
     {
         self::$instance = null;
@@ -109,9 +148,12 @@ class Database
             throw new PDOException('Could not read SQL file.');
         }
 
+        // Strip single-line SQL comments so statements are not skipped.
+        $sql = preg_replace('/^\s*--.*$/m', '', $sql) ?? $sql;
+
         $statements = array_filter(
             array_map('trim', explode(';', $sql)),
-            fn(string $s) => $s !== '' && !str_starts_with($s, '--')
+            fn(string $s) => $s !== ''
         );
 
         foreach ($statements as $statement) {

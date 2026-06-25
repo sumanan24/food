@@ -44,3 +44,13 @@ function clear_old(): void
 {
     unset($_SESSION['_old']);
 }
+
+function parse_amount(mixed $value): float
+{
+    $clean = preg_replace('/[^\d.]/', '', (string) $value);
+    if ($clean === '' || !is_numeric($clean)) {
+        return 0.0;
+    }
+
+    return (float) $clean;
+}

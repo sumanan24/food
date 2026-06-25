@@ -11,13 +11,22 @@ class Item extends Model
     public function all(): array
     {
         return $this->db->query(
-            'SELECT * FROM items WHERE is_active = 1 ORDER BY name ASC'
+            'SELECT * FROM items WHERE is_active = 1 ORDER BY item_type ASC, name ASC'
         )->fetchAll();
+    }
+
+    public function allByType(string $type): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT * FROM items WHERE is_active = 1 AND item_type = :type ORDER BY name ASC'
+        );
+        $stmt->execute(['type' => $type]);
+        return $stmt->fetchAll();
     }
 
     public function allWithInactive(): array
     {
-        return $this->db->query('SELECT * FROM items ORDER BY name ASC')->fetchAll();
+        return $this->db->query('SELECT * FROM items ORDER BY item_type ASC, name ASC')->fetchAll();
     }
 
     public function find(int $id): ?array
@@ -31,14 +40,17 @@ class Item extends Model
     public function create(array $data): int
     {
         $stmt = $this->db->prepare(
-            'INSERT INTO items (name, cost_price, selling_price, current_stock) 
-             VALUES (:name, :cost_price, :selling_price, :current_stock)'
+            'INSERT INTO items (name, item_type, cost_price, selling_price, current_stock, reorder_level, unit) 
+             VALUES (:name, :item_type, :cost_price, :selling_price, :current_stock, :reorder_level, :unit)'
         );
         $stmt->execute([
             'name' => $data['name'],
+            'item_type' => $data['item_type'] ?? 'long',
             'cost_price' => $data['cost_price'],
             'selling_price' => $data['selling_price'],
             'current_stock' => $data['current_stock'] ?? 0,
+            'reorder_level' => $data['reorder_level'] ?? 10,
+            'unit' => $data['unit'] ?? 'pcs',
         ]);
         return (int) $this->db->lastInsertId();
     }
@@ -46,15 +58,19 @@ class Item extends Model
     public function update(int $id, array $data): bool
     {
         $stmt = $this->db->prepare(
-            'UPDATE items SET name = :name, cost_price = :cost_price, 
-             selling_price = :selling_price, current_stock = :current_stock WHERE id = :id'
+            'UPDATE items SET name = :name, item_type = :item_type, cost_price = :cost_price, 
+             selling_price = :selling_price, current_stock = :current_stock,
+             reorder_level = :reorder_level, unit = :unit WHERE id = :id'
         );
         return $stmt->execute([
             'id' => $id,
             'name' => $data['name'],
+            'item_type' => $data['item_type'],
             'cost_price' => $data['cost_price'],
             'selling_price' => $data['selling_price'],
             'current_stock' => $data['current_stock'],
+            'reorder_level' => $data['reorder_level'],
+            'unit' => $data['unit'],
         ]);
     }
 
@@ -96,5 +112,13 @@ class Item extends Model
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
         return (int) $stmt->fetchColumn() > 0;
+    }
+
+    public function lowStockItems(): array
+    {
+        return $this->db->query(
+            "SELECT * FROM items WHERE is_active = 1 AND item_type = 'long'
+             AND current_stock <= reorder_level ORDER BY current_stock ASC"
+        )->fetchAll();
     }
 }

@@ -109,9 +109,12 @@ class ItemController extends Controller
 
         return [
             'name' => $name,
+            'item_type' => in_array($this->input('item_type'), ['daily', 'long'], true) ? $this->input('item_type') : 'long',
             'cost_price' => $costPrice,
             'selling_price' => $sellingPrice,
             'current_stock' => $stock,
+            'reorder_level' => max(0, (float) $this->input('reorder_level', 10)),
+            'unit' => trim((string) $this->input('unit', 'pcs')) ?: 'pcs',
         ];
     }
 }

@@ -281,6 +281,7 @@ h1, h2, h3, h4, h5, h6, .font-display {
 
 .role-admin { background: rgba(255, 107, 53, 0.25); color: #ffb899; }
 .role-staff { background: rgba(46, 196, 182, 0.25); color: #7ee8dc; }
+.role-cashier { background: rgba(46, 196, 182, 0.25); color: #7ee8dc; }
 
 .sidebar-actions {
     display: flex;
@@ -1825,4 +1826,115 @@ h1, h2, h3, h4, h5, h6, .font-display {
     .dashboard-page .stat-value {
         font-size: clamp(0.85rem, 3.5vw, 1rem);
     }
+}
+
+/* ---- POS Billing ---- */
+.pos-item-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.625rem;
+}
+
+.pos-item-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    text-align: left;
+    transition: all 0.2s;
+    cursor: pointer;
+    width: 100%;
+}
+
+.pos-item-btn:hover {
+    border-color: var(--primary);
+    background: rgba(255, 107, 53, 0.08);
+}
+
+.pos-item-btn strong {
+    font-size: 0.875rem;
+    color: var(--dark);
+}
+
+.pos-item-btn span {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 0.8125rem;
+}
+
+.pos-item-btn small {
+    color: var(--text-muted);
+    font-size: 0.7rem;
+}
+
+.pos-cart-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.625rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.pos-billing-disabled {
+    opacity: 0.55;
+    pointer-events: none;
+    user-select: none;
+}
+
+.cash-action-card .btn-lg {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.cash-amount-input-wrap {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--surface);
+}
+
+.cash-amount-prefix {
+    display: flex;
+    align-items: center;
+    padding: 0 0.875rem;
+    background: var(--surface-alt, #f8f9fa);
+    border-right: 1px solid var(--border);
+    color: var(--text-muted);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.cash-amount-input {
+    border: 0 !important;
+    border-radius: 0 !important;
+    font-size: 1.25rem;
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    box-shadow: none !important;
+}
+
+.cash-amount-input:focus {
+    outline: none;
+}
+
+.cash-close-preview {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.receipt-card {
+    max-width: 400px;
+}
+
+@media print {
+    .sidebar, .topbar, .mobile-bottom-nav, .no-print, .alert { display: none !important; }
+    .main-content { padding: 0 !important; }
+    .receipt-card { box-shadow: none !important; border: none !important; }
 }

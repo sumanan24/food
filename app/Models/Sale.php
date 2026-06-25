@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Core\Model;
+use App\Services\StockService;
 
 class Sale extends Model
 {
@@ -14,17 +15,22 @@ class Sale extends Model
         try {
             $itemModel = new Item();
             $item = $itemModel->find((int) $data['item_id']);
-            if (!$item || (float) $item['current_stock'] < (float) $data['quantity']) {
+            if (!$item) {
+                throw new \RuntimeException('Item not found.');
+            }
+
+            if ($item['item_type'] === 'long' && (float) $item['current_stock'] < (float) $data['quantity']) {
                 throw new \RuntimeException('Insufficient stock for this sale.');
             }
 
             $stmt = $this->db->prepare(
-                'INSERT INTO sales (item_id, user_id, quantity, unit_price, total_price, sale_date, notes)
-                 VALUES (:item_id, :user_id, :quantity, :unit_price, :total_price, :sale_date, :notes)'
+                'INSERT INTO sales (item_id, user_id, bill_id, quantity, unit_price, total_price, sale_date, notes)
+                 VALUES (:item_id, :user_id, :bill_id, :quantity, :unit_price, :total_price, :sale_date, :notes)'
             );
             $stmt->execute([
                 'item_id' => $data['item_id'],
                 'user_id' => $data['user_id'],
+                'bill_id' => $data['bill_id'] ?? null,
                 'quantity' => $data['quantity'],
                 'unit_price' => $data['unit_price'],
                 'total_price' => $data['total_price'],
@@ -33,7 +39,14 @@ class Sale extends Model
             ]);
             $id = (int) $this->db->lastInsertId();
 
-            if (!$itemModel->decreaseStock((int) $data['item_id'], (float) $data['quantity'])) {
+            $stockService = new StockService();
+            if (!$stockService->recordSale(
+                (int) $data['item_id'],
+                (int) $data['user_id'],
+                (float) $data['quantity'],
+                $id,
+                $data['sale_date']
+            )) {
                 throw new \RuntimeException('Failed to update stock.');
             }
 
@@ -43,6 +56,11 @@ class Sale extends Model
             $this->db->rollBack();
             throw $e;
         }
+    }
+
+    public function createFromBill(array $data): int
+    {
+        return $this->create($data);
     }
 
     public function todayTotal(): float
@@ -66,7 +84,7 @@ class Sale extends Model
 
     public function history(?string $date = null): array
     {
-        $sql = 'SELECT s.*, i.name AS item_name, u.name AS user_name
+        $sql = 'SELECT s.*, i.name AS item_name, i.item_type, u.name AS user_name
                 FROM sales s
                 JOIN items i ON i.id = s.item_id
                 JOIN users u ON u.id = s.user_id';

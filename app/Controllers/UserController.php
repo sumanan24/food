@@ -37,15 +37,15 @@ class UserController extends Controller
         $name = trim((string) $this->input('name', ''));
         $email = trim((string) $this->input('email', ''));
         $password = (string) $this->input('password', '');
-        $role = (string) $this->input('role', 'staff');
+        $role = (string) $this->input('role', 'cashier');
 
         if ($name === '' || $email === '' || $password === '') {
             Session::flash('error', 'All fields are required.');
             $this->redirect('/users/create');
         }
 
-        if (!in_array($role, ['admin', 'staff'], true)) {
-            $role = 'staff';
+        if (!in_array($role, ['admin', 'cashier'], true)) {
+            $role = 'cashier';
         }
 
         if ($this->userModel->findByEmail($email)) {

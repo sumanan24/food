@@ -18,24 +18,33 @@ class InstallController extends Controller
 
     public function index(): void
     {
+        if (Database::isInstalled()) {
+            $this->redirect('/login');
+        }
+
         if (file_exists(CONFIG_PATH . '/database.local.php')) {
-            $userModel = new User();
-            if ($userModel->countAll() > 0) {
-                $this->redirect('/login');
+            try {
+                if (!Database::isSchemaReady()) {
+                    Database::ensureSchema();
+                    Session::flash('success', 'Database tables were created. Default admin: admin@foodshop.com / admin123');
+                }
+                Session::set('install_step', 2);
+            } catch (\Throwable $e) {
+                Session::flash('error', 'Database setup incomplete: ' . $e->getMessage());
+                Session::set('install_step', 1);
             }
-            Session::set('install_step', 2);
         }
 
         $this->view('install/index', [
             'title' => 'Installation Wizard',
             'step' => (int) Session::get('install_step', 1),
-            'dbConfig' => Session::get('install_db', []),
+            'dbConfig' => Session::get('install_db', $this->loadDbConfig()),
         ], 'layouts/install');
     }
 
     public function database(): void
     {
-        if (file_exists(CONFIG_PATH . '/database.local.php')) {
+        if (Database::isInstalled()) {
             $this->redirect('/login');
         }
 
@@ -67,14 +76,15 @@ class InstallController extends Controller
             file_put_contents(CONFIG_PATH . '/database.local.php', $configContent);
 
             Database::reset();
-            Database::runSqlFile(ROOT_PATH . '/sql/schema.sql');
-            Database::runSqlFile(ROOT_PATH . '/sql/seed.sql');
+            Database::runSqlFile(ROOT_PATH . '/sql/schema.sql', $config);
+            Database::runSqlFile(ROOT_PATH . '/sql/seed.sql', $config);
 
             Session::set('install_db', $config);
             Session::set('install_step', 2);
             Session::flash('success', 'Database configured. Default admin: admin@foodshop.com / admin123');
         } catch (\Throwable $e) {
             @unlink(CONFIG_PATH . '/database.local.php');
+            Database::reset();
             Session::flash('error', 'Installation failed: ' . $e->getMessage());
         }
 
@@ -85,6 +95,15 @@ class InstallController extends Controller
     {
         if (!file_exists(CONFIG_PATH . '/database.local.php')) {
             Session::flash('error', 'Please complete database setup first.');
+            $this->redirect('/install');
+        }
+
+        try {
+            if (!Database::isSchemaReady()) {
+                Database::ensureSchema();
+            }
+        } catch (\Throwable $e) {
+            Session::flash('error', 'Could not prepare database: ' . $e->getMessage());
             $this->redirect('/install');
         }
 
@@ -126,9 +145,8 @@ class InstallController extends Controller
             'role' => 'admin',
         ]);
 
-        // Seed default expense categories
         $pdo = Database::getInstance();
-        $categories = ['Rent', 'Utilities', 'Salaries', 'Transport', 'Miscellaneous'];
+        $categories = ['Electricity', 'Water', 'Salary', 'Transport', 'Gas', 'Other'];
         $stmt = $pdo->prepare('INSERT IGNORE INTO expense_categories (name) VALUES (:name)');
         foreach ($categories as $cat) {
             $stmt->execute(['name' => $cat]);
@@ -138,5 +156,14 @@ class InstallController extends Controller
         Session::remove('install_db');
         Session::flash('success', 'Installation complete! You can now login.');
         $this->redirect('/login');
+    }
+
+    private function loadDbConfig(): array
+    {
+        if (!file_exists(CONFIG_PATH . '/database.local.php')) {
+            return [];
+        }
+        $config = require CONFIG_PATH . '/database.local.php';
+        return is_array($config) ? $config : [];
     }
 }

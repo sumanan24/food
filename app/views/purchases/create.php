@@ -27,6 +27,10 @@
                     <?php endforeach; ?>
                 </select>
             </div>
+            <div class="mb-3">
+                <label class="form-label">Supplier Name</label>
+                <input type="text" name="supplier_name" class="form-control" placeholder="e.g. Local Market">
+            </div>
             <div class="row g-3">
                 <div class="col-6">
                     <label class="form-label">Quantity *</label>

@@ -49,6 +49,7 @@ class PurchaseController extends Controller
         $unitCost = (float) $this->input('unit_cost', 0);
         $purchaseDate = (string) $this->input('purchase_date', date('Y-m-d'));
         $notes = trim((string) $this->input('notes', ''));
+        $supplierName = trim((string) $this->input('supplier_name', ''));
 
         if ($itemId <= 0 || $quantity <= 0 || $unitCost < 0) {
             Session::flash('error', 'Please provide valid purchase details.');
@@ -65,6 +66,7 @@ class PurchaseController extends Controller
             $this->purchaseModel->create([
                 'item_id' => $itemId,
                 'user_id' => Auth::id(),
+                'supplier_name' => $supplierName ?: null,
                 'quantity' => $quantity,
                 'unit_cost' => $unitCost,
                 'total_cost' => $quantity * $unitCost,

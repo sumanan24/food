@@ -30,7 +30,7 @@
                 <div class="col-12 col-sm-6">
                     <label class="form-label">Role *</label>
                     <select name="role" class="form-select" required>
-                        <option value="staff">Staff</option>
+                        <option value="cashier">Cashier</option>
                         <option value="admin">Admin</option>
                     </select>
                 </div>
