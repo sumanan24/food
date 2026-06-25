@@ -1,5 +1,6 @@
--- Allow multiple bill counter open/close cycles per day (v4)
--- Run once on existing databases.
+-- v4: Multiple bill counter open/close cycles per day
+-- Applied automatically by Database::ensureMigrations() on each request.
+-- Manual import is optional (e.g. phpMyAdmin) if you prefer running SQL yourself.
 
 ALTER TABLE `cash_sessions` DROP INDEX `uk_cash_session_date`;
 

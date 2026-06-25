@@ -82,6 +82,109 @@ class Database
         }
     }
 
+    /** Apply incremental schema updates on existing installations. */
+    public static function ensureMigrations(): void
+    {
+        if (!self::isSchemaReady()) {
+            return;
+        }
+
+        $pdo = self::getInstance();
+        if (!$pdo->query("SHOW TABLES LIKE 'cash_sessions'")->fetch()) {
+            return;
+        }
+
+        self::migrateCashCounterV3($pdo);
+        self::migrateCashMultiSessionsV4($pdo);
+    }
+
+    private static function migrateCashCounterV3(PDO $pdo): void
+    {
+        if (!self::columnExists($pdo, 'cash_sessions', 'counter_person_name')) {
+            $pdo->exec(
+                "ALTER TABLE `cash_sessions`
+                 ADD COLUMN `counter_person_name` VARCHAR(100) NOT NULL DEFAULT '' AFTER `user_id`"
+            );
+        }
+
+        if (!self::columnExists($pdo, 'cash_sessions', 'closed_by_name')) {
+            $pdo->exec(
+                "ALTER TABLE `cash_sessions`
+                 ADD COLUMN `closed_by_name` VARCHAR(100) NULL AFTER `cash_difference`"
+            );
+        }
+    }
+
+    private static function migrateCashMultiSessionsV4(PDO $pdo): void
+    {
+        if (self::indexExists($pdo, 'cash_sessions', 'uk_cash_session_date')) {
+            $pdo->exec('ALTER TABLE `cash_sessions` DROP INDEX `uk_cash_session_date`');
+        }
+
+        if (!self::indexExists($pdo, 'cash_sessions', 'idx_cash_sessions_date_status')) {
+            $pdo->exec(
+                'ALTER TABLE `cash_sessions`
+                 ADD KEY `idx_cash_sessions_date_status` (`session_date`, `status`)'
+            );
+        }
+
+        if (!self::columnExists($pdo, 'bills', 'cash_session_id')) {
+            $pdo->exec(
+                'ALTER TABLE `bills`
+                 ADD COLUMN `cash_session_id` INT UNSIGNED NULL AFTER `user_id`'
+            );
+        }
+
+        if (!self::indexExists($pdo, 'bills', 'idx_bills_cash_session')) {
+            $pdo->exec(
+                'ALTER TABLE `bills`
+                 ADD KEY `idx_bills_cash_session` (`cash_session_id`)'
+            );
+        }
+
+        if (!self::foreignKeyExists($pdo, 'bills', 'fk_bills_cash_session')) {
+            $pdo->exec(
+                'ALTER TABLE `bills`
+                 ADD CONSTRAINT `fk_bills_cash_session`
+                 FOREIGN KEY (`cash_session_id`) REFERENCES `cash_sessions` (`id`) ON DELETE SET NULL'
+            );
+        }
+    }
+
+    private static function columnExists(PDO $pdo, string $table, string $column): bool
+    {
+        $stmt = $pdo->prepare(
+            'SELECT COUNT(*) FROM information_schema.columns
+             WHERE table_schema = DATABASE() AND table_name = :table AND column_name = :column'
+        );
+        $stmt->execute(['table' => $table, 'column' => $column]);
+
+        return (int) $stmt->fetchColumn() > 0;
+    }
+
+    private static function indexExists(PDO $pdo, string $table, string $indexName): bool
+    {
+        $stmt = $pdo->prepare(
+            'SELECT COUNT(*) FROM information_schema.statistics
+             WHERE table_schema = DATABASE() AND table_name = :table AND index_name = :index'
+        );
+        $stmt->execute(['table' => $table, 'index' => $indexName]);
+
+        return (int) $stmt->fetchColumn() > 0;
+    }
+
+    private static function foreignKeyExists(PDO $pdo, string $table, string $constraintName): bool
+    {
+        $stmt = $pdo->prepare(
+            "SELECT COUNT(*) FROM information_schema.table_constraints
+             WHERE table_schema = DATABASE() AND table_name = :table
+             AND constraint_name = :name AND constraint_type = 'FOREIGN KEY'"
+        );
+        $stmt->execute(['table' => $table, 'name' => $constraintName]);
+
+        return (int) $stmt->fetchColumn() > 0;
+    }
+
     public static function reset(): void
     {
         self::$instance = null;
