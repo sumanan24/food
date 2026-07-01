@@ -108,4 +108,29 @@ class CashController extends Controller
 
         $this->redirect('/cash');
     }
+
+    public function updateClose(int $id): void
+    {
+        $this->validateCsrf();
+
+        $session = $this->cashModel->find($id);
+        if (!$session || $session['status'] !== 'closed') {
+            Session::flash('error', 'Closed session not found.');
+            $this->redirect('/cash');
+        }
+
+        $cashReceived = parse_amount($this->input('cash_received', 0));
+        if ($cashReceived < 0) {
+            Session::flash('error', 'Close cash amount cannot be negative.');
+            $this->redirect('/cash');
+        }
+
+        if ($this->cashModel->updateCloseValue($id, $cashReceived)) {
+            Session::flash('success', 'Close cash updated to ' . money($cashReceived) . '.');
+        } else {
+            Session::flash('error', 'Failed to update close cash.');
+        }
+
+        $this->redirect('/cash');
+    }
 }

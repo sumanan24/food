@@ -48,6 +48,7 @@ $router->get('/pos/history', [PosController::class, 'history'], [AuthMiddleware:
 $router->get('/cash', [CashController::class, 'index'], [AuthMiddleware::class]);
 $router->post('/cash/open', [CashController::class, 'open'], [AuthMiddleware::class]);
 $router->post('/cash/close', [CashController::class, 'close'], [AuthMiddleware::class]);
+$router->post('/cash/update-close/{id}', [CashController::class, 'updateClose'], [AuthMiddleware::class]);
 
 // Daily Food Balance
 $router->get('/daily-balance', [DailyBalanceController::class, 'index'], [AuthMiddleware::class]);

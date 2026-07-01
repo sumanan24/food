@@ -73,7 +73,12 @@
                     $lastClosed = end($closedToday);
                 ?>
                     <div class="table-card mt-3">
-                        <h5 class="mb-3">Last Closed Session</h5>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Last Closed Session</h5>
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editCloseModal<?= (int) $lastClosed['id'] ?>">
+                                <i class="bi bi-pencil me-1"></i> Edit Close
+                            </button>
+                        </div>
                         <div class="transaction-detail-grid">
                             <div class="transaction-detail"><span class="transaction-detail-label">Opened</span><span><?= e(date('h:i A', strtotime($lastClosed['opened_at']))) ?></span></div>
                             <div class="transaction-detail"><span class="transaction-detail-label">Closed</span><span><?= e(date('h:i A', strtotime($lastClosed['closed_at']))) ?></span></div>
@@ -156,7 +161,14 @@
                                     · Sales <?= $symbol ?> <?= money($h['total_sales']) ?>
                                 <?php endif; ?>
                             </span>
-                            <span class="stock-badge <?= $h['status'] === 'closed' ? 'ok' : 'low' ?>"><?= e(ucfirst($h['status'])) ?></span>
+                            <div class="d-flex align-items-center gap-2">
+                                <?php if ($h['status'] === 'closed'): ?>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editCloseModal<?= (int) $h['id'] ?>" title="Edit close cash">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                <?php endif; ?>
+                                <span class="stock-badge <?= $h['status'] === 'closed' ? 'ok' : 'low' ?>"><?= e(ucfirst($h['status'])) ?></span>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -177,7 +189,14 @@
                                     · Close <?= $symbol ?> <?= money($h['cash_received']) ?>
                                 <?php endif; ?>
                             </span>
-                            <span class="stock-badge <?= $h['status'] === 'closed' ? 'ok' : 'low' ?>"><?= e(ucfirst($h['status'])) ?></span>
+                            <div class="d-flex align-items-center gap-2">
+                                <?php if ($h['status'] === 'closed'): ?>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editCloseModal<?= (int) $h['id'] ?>" title="Edit close cash">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                <?php endif; ?>
+                                <span class="stock-badge <?= $h['status'] === 'closed' ? 'ok' : 'low' ?>"><?= e(ucfirst($h['status'])) ?></span>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -185,6 +204,23 @@
         </div>
     </div>
 </div>
+
+<?php
+$closedForEdit = [];
+foreach ($todaySessions as $s) {
+    if ($s['status'] === 'closed') {
+        $closedForEdit[(int) $s['id']] = $s;
+    }
+}
+foreach ($history as $s) {
+    if ($s['status'] === 'closed') {
+        $closedForEdit[(int) $s['id']] = $s;
+    }
+}
+foreach ($closedForEdit as $sessionRow) {
+    require VIEW_PATH . '/cash/partials/edit-close-modal.php';
+}
+?>
 
 <?php if ($session): ?>
 <script>
@@ -211,3 +247,32 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 <?php endif; ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const symbol = <?= json_encode($symbol) ?>;
+
+    function parseAmount(value) {
+        const clean = String(value).replace(/[^\d.]/g, '');
+        return clean === '' || isNaN(clean) ? 0 : parseFloat(clean);
+    }
+
+    document.querySelectorAll('.cash-edit-close-input').forEach(function (input) {
+        const diffEl = document.getElementById(input.dataset.diffTarget);
+        if (!diffEl) {
+            return;
+        }
+
+        const expected = parseFloat(input.dataset.expected || '0');
+
+        function updateDiff() {
+            const counted = parseAmount(input.value);
+            const diff = counted - expected;
+            diffEl.textContent = symbol + ' ' + diff.toFixed(2);
+            diffEl.className = diff >= 0 ? 'text-profit' : 'text-loss';
+        }
+
+        input.addEventListener('input', updateDiff);
+    });
+});
+</script>

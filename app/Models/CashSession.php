@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Core\Model;
-use App\Services\StockService;
 
 class CashSession extends Model
 {
@@ -122,6 +121,36 @@ class CashSession extends Model
             'closed_by_name' => $closedByName,
             'closed_at' => $closedAt,
             'notes' => $notes,
+        ]);
+    }
+
+    public function updateCloseValue(int $id, float $cashReceived): bool
+    {
+        $session = $this->find($id);
+        if (!$session || $session['status'] !== 'closed') {
+            return false;
+        }
+
+        if ($cashReceived < 0) {
+            return false;
+        }
+
+        $expectedCash = (float) $session['opening_balance']
+            + (float) $session['total_sales']
+            - (float) $session['total_expenses'];
+        $cashDifference = $cashReceived - $expectedCash;
+
+        $stmt = $this->db->prepare(
+            'UPDATE cash_sessions SET cash_received = :cash_received,
+             closing_balance = :closing_balance, cash_difference = :cash_difference
+             WHERE id = :id AND status = \'closed\''
+        );
+
+        return $stmt->execute([
+            'id' => $id,
+            'cash_received' => $cashReceived,
+            'closing_balance' => $cashReceived,
+            'cash_difference' => $cashDifference,
         ]);
     }
 
